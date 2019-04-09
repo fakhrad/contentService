@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var sysfld = require('./sys');
+var ctype = require('./contentType');
 var Schema = mongoose.Schema;
 
 var content = new Schema({
@@ -7,7 +8,9 @@ var content = new Schema({
     fields : [Object],
     status : {type : String, enum : ['draft', 'published', 'changed', 'archived'], default : 'draft'},
     statusLog : [status],
-    versions : [Object]
+    versions : [Object],
+    contentType : {type: Schema.Types.ObjectId, ref: 'ContentType' , required : true},
+    category : {type: Schema.Types.ObjectId, ref: 'Category' , required : true}
 });
 
 content.pre('save', function(next) {

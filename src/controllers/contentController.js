@@ -90,6 +90,8 @@ var addContent = function(req, cb)
 {
     var content = new Content({
         fields: req.body.fields,
+        contentType : req.body.contentType,
+        category : req.body.category
     });
 
     content.save(function(err){
@@ -169,7 +171,8 @@ var updateContent = function(req, cb)
         }
         if (content)
         {
-            content.fields = req.body.fields
+            content.fields = req.body.fields;
+            content.category = req.body.catgory;
             content.save(function(err){
                 if(err)
                 {

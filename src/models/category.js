@@ -1,8 +1,7 @@
 var mongoose = require('mongoose');
 var sysfld = require('./sys');
 var Schema = mongoose.Schema;
-
-var 
+ 
 var category = new Schema({
     sys : {type : sysfld, required : true},
     code : {type:Number},

@@ -2,8 +2,7 @@ var mongoose = require('mongoose');
 var sysfld = require('./sys');
 var status = require('./status');
 var Schema = mongoose.Schema;
-
-var 
+ 
 var asset = new Schema({
     sys : {type : sysfld, required : true},
     name : {type : Object, required:true},
