@@ -1,4 +1,4 @@
-const Contents = require('../models/contents');
+const Contents = require('../models/content');
 
 var loadContents = function(req, cb)
 {

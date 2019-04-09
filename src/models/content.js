@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var sysfld = require('./sys');
 var ctype = require('./contentType');
+var status = require('./status');
 var Schema = mongoose.Schema;
 
 var content = new Schema({
