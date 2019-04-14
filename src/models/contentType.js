@@ -6,11 +6,11 @@ var Schema = mongoose.Schema;
 var contentType = new Schema({
     sys : {type:Object, required :true},
     name : {type : Object, required : true},
-    displayName : {type : Object, required : true},
+    title : {type : Object, required : true},
     description : {type : Object},
-    localize : {type : Boolean, default : true},
+    versioning : {type : Boolean, default : true},
     template : {type : String, required : true},
-    image : {type : Object},
+    media : [Object],
     fields : [field],
     status : {type : Object, required : true}
 });

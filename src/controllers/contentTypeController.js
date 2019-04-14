@@ -64,10 +64,11 @@ var addContentTypes = function(req, cb)
     var cat = new ContentTypes({
         displayName : req.body.displayName,
         name : req.body.name,
+        title : req.body.title,
         description : req.body.description,
-        localize : req.body.localize,
+        versioning : req.body.versioning,
         template : req.body.template,
-        image : req.body.image,
+        media : req.body.media,
         fields : req.body.fields
     });
     cat.save(function(err){
@@ -105,10 +106,11 @@ var updateContentType = function(req, cb)
         {
             contentType.displayName = req.body.displayName;
             contentType.name = req.body.name;
+            contentType.title = req.body.title;
             contentType.description = req.body.description;
-            contentType.localize = req.body.localize;
+            contentType.versioning = req.body.versioning;
             contentType.template = req.body.template;
-            contentType.image = req.body.image;
+            contentType.media = req.body.media;
             contentType.fields = req.body.fields;
             contentType.save(function(err){
                 if(err)
