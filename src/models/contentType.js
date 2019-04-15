@@ -12,7 +12,7 @@ var contentType = new Schema({
     template : {type : String, required : true},
     media : [Object],
     fields : [field],
-    status : {type : Object, required : true}
+    status : {type : Boolean, required : true, default : true}
 });
 
 contentType.pre('save', function(next) {
