@@ -1,4 +1,4 @@
-const Assets = require('../models/Assets');
+const Assets = require('../models/asset');
 
 var findAll = function(req, cb)
 {
