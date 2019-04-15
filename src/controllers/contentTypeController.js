@@ -1,4 +1,3 @@
-var ContentTypes = require('../models/contentTypes'); 
 var ContentTypes = require('../models/contentType'); 
 
 var getContentTypes = function(req, cb)
