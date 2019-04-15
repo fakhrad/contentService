@@ -272,4 +272,4 @@ exports.findbycode = findByCode;
 exports.findbyparentid = findByParentId;
 exports.addcategory = addCategory;
 exports.deletecategory = deleteCategory;
-exports.updateCategory = updateCategory;
+exports.updatecategory = updateCategory;
