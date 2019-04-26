@@ -2,10 +2,10 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var field = new Schema({
-    name : {type:String, required :true, unique:true},
-    title : {type : String, required : true},
+    name : {type:Object, required :true, unique:true},
+    title : {type : Object, required : true},
     desc : {type : Object},
-    dataType : {type : Object, required : true},
+    type : {type : Object, required : true},
     localize : {type : Boolean, default : false}
 }, { toJSON: { virtuals: true } });
   

@@ -2,7 +2,7 @@ const Assets = require('../models/asset');
 
 var findAll = function(req, cb)
 {
-    Assets.find({"clientId" : req.body.clientId}).exec(function(err, Assets){
+    Assets.find({"clientId" : req.clientId}).exec(function(err, Assets){
         var result = {success : false, data : null, error : null };
         if (err)
         {

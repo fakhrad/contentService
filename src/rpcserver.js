@@ -52,7 +52,7 @@ function whenConnected() {
       ch.assertQueue("getcontents", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
-              contentController.getcontents({body : req}, (result)=>{
+              contentController.getcontents(req, (result)=>{
                   ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                   ch.ack(msg);
               });
@@ -61,7 +61,7 @@ function whenConnected() {
       ch.assertQueue("addcontenttype", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            ctypeController.addContentTypes({body : req}, (result)=>{
+            ctypeController.addContentTypes(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -70,7 +70,7 @@ function whenConnected() {
       ch.assertQueue("updatecontenttype", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            ctypeController.updateContentType({body : req}, (result)=>{
+            ctypeController.updateContentType(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -79,7 +79,7 @@ function whenConnected() {
       ch.assertQueue("removecontenttype", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            ctypeController.deleteContentTypes({body : req}, (result)=>{
+            ctypeController.deleteContentTypes(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -88,7 +88,7 @@ function whenConnected() {
       ch.assertQueue("getcontenttypes", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            ctypeController.getContentTypes({body : req}, (result)=>{
+            ctypeController.getContentTypes(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -98,7 +98,7 @@ function whenConnected() {
       ch.assertQueue("addasset", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            assetController.add({body : req}, (result)=>{
+            assetController.add(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -107,7 +107,7 @@ function whenConnected() {
       ch.assertQueue("updateasset", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            assetController.update({body : req}, (result)=>{
+            assetController.update(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -116,7 +116,7 @@ function whenConnected() {
       ch.assertQueue("removeasset", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            assetController.remove({body : req}, (result)=>{
+            assetController.remove(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -125,7 +125,7 @@ function whenConnected() {
       ch.assertQueue("getallassets", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            assetController.getAll({body : req}, (result)=>{
+            assetController.getAll(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -134,7 +134,7 @@ function whenConnected() {
       ch.assertQueue("publishasset", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            assetController.publish({body : req}, (result)=>{
+            assetController.publish(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -143,7 +143,7 @@ function whenConnected() {
       ch.assertQueue("unpublishasset", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            assetController.unPublish({body : req}, (result)=>{
+            assetController.unPublish(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -152,7 +152,7 @@ function whenConnected() {
       ch.assertQueue("archiveasset", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            assetController.archive({body : req}, (result)=>{
+            assetController.archive(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -161,7 +161,7 @@ function whenConnected() {
       ch.assertQueue("unarchiveasset", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            assetController.unArchive({body : req}, (result)=>{
+            assetController.unArchive(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -172,7 +172,7 @@ function whenConnected() {
       ch.assertQueue("addcontent", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            contentController.add({body : req}, (result)=>{
+            contentController.add(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -181,7 +181,7 @@ function whenConnected() {
       ch.assertQueue("updatecontent", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            contentController.update({body : req}, (result)=>{
+            contentController.update(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -190,7 +190,7 @@ function whenConnected() {
       ch.assertQueue("removecontent", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            contentController.remove({body : req}, (result)=>{
+            contentController.remove(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -199,7 +199,7 @@ function whenConnected() {
       ch.assertQueue("getallcontents", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            contentController.getAll({body : req}, (result)=>{
+            contentController.getAll(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -208,7 +208,7 @@ function whenConnected() {
       ch.assertQueue("publishcontent", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            contentController.publish({body : req}, (result)=>{
+            contentController.publish(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -217,7 +217,7 @@ function whenConnected() {
       ch.assertQueue("unpublishcontent", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            contentController.unPublish({body : req}, (result)=>{
+            contentController.unPublish(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -226,7 +226,7 @@ function whenConnected() {
       ch.assertQueue("archivecontent", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            contentController.archive({body : req}, (result)=>{
+            contentController.archive(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -235,7 +235,7 @@ function whenConnected() {
       ch.assertQueue("unarchivecontent", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            contentController.unArchive({body : req}, (result)=>{
+            contentController.unArchive(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -246,7 +246,7 @@ function whenConnected() {
       ch.assertQueue("addcategory", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            categoriesController.addcategory({body : req}, (result)=>{
+            categoriesController.addcategory(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -255,7 +255,7 @@ function whenConnected() {
       ch.assertQueue("updatecategory", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            categoriesController.updatecategory({body : req}, (result)=>{
+            categoriesController.updatecategory(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -264,7 +264,7 @@ function whenConnected() {
       ch.assertQueue("removecategory", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            categoriesController.removecategory({body : req}, (result)=>{
+            categoriesController.removecategory(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });
@@ -273,7 +273,7 @@ function whenConnected() {
       ch.assertQueue("getallcategories", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            categoriesController.getcategories({body : req}, (result)=>{
+            categoriesController.getcategories(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });

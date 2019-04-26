@@ -31,8 +31,8 @@ var getcatgories = function(req, cb)
 {
     async.parallel(
         {
-            categories : function(callback) {Category.find({clientId : req.body.clientId}).exec(callback)},
-            contentTypes : function(callback) {Product.find({clientId : req.body.clientId}).exec(callback)}
+            categories : function(callback) {Category.find({clientId : req.clientId}).exec(callback)},
+            contentTypes : function(callback) {Product.find({clientId : req.clientId}).exec(callback)}
         }, function( err, results){
             var result = {success : false, data : null, error : null };
             if (err)
@@ -106,7 +106,7 @@ var findById = function(req, cb)
 
 var findByCode = function(req, cb)
 {
-    Category.find({"code" : "^" + req.body.code, "clientId" : req.body.clientId}).exec(function(err, category){
+    Category.find({"code" : "^" + req.body.code, "clientId" : req.clientId}).exec(function(err, category){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -135,7 +135,7 @@ var findByCode = function(req, cb)
 
 var findByParentId = function(req, cb)
 {
-    Category.find({"parentId" : req.body.parentId, "clientId" : req.body.clientId}).exec(function(err, categories){
+    Category.find({"parentId" : req.body.parentId, "clientId" : req.clientId}).exec(function(err, categories){
         var result = {success : false, data : null, error : null };
         if (err)
         {

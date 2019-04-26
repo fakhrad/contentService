@@ -2,7 +2,7 @@ var ContentTypes = require('../models/contentType');
 
 var getContentTypes = function(req, cb)
 {
-     ContentTypes.find({"clientId" : req.body.clientId}).exec(function(err, contentTypes){
+     ContentTypes.find({"clientId" : req.clientId}).exec(function(err, contentTypes){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -60,6 +60,7 @@ var findById = function(req, cb)
 
 var addContentTypes = function(req, cb)
 {
+    
     var cat = new ContentTypes({
         displayName : req.body.displayName,
         name : req.body.name,
@@ -77,6 +78,7 @@ var addContentTypes = function(req, cb)
             result.success = false;
             result.data =  undefined;
             result.error = err;
+            console.log(err);
             cb(result);       
             return; 
         }
@@ -103,7 +105,6 @@ var updateContentType = function(req, cb)
         }
         if (contentType)
         {
-            contentType.displayName = req.body.displayName;
             contentType.name = req.body.name;
             contentType.title = req.body.title;
             contentType.description = req.body.description;
@@ -122,7 +123,7 @@ var updateContentType = function(req, cb)
                 }
                 //Successfull. 
                 //Publish user profile updated event
-                ContentType.findById(req.body.id).exec(function(err, contentType){
+                ContentTypes.findById(req.body.id).exec(function(err, contentType){
                     if(err)
                     {
                         result.success = false;

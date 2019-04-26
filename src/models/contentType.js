@@ -4,7 +4,7 @@ var sysfld = require('./sys');
 var Schema = mongoose.Schema;
 
 var contentType = new Schema({
-    sys : {type:Object, required :true},
+    sys : {type:Object},
     name : {type : Object, required : true},
     title : {type : Object, required : true},
     description : {type : Object},
@@ -16,18 +16,25 @@ var contentType = new Schema({
 });
 
 contentType.pre('save', function(next) {
+
+    console.log('sys initiated')
     var cont = this;
-    var sys = new sysfld();
-    sys.id = this.id;
-    sys.type = "contentType";
-    sys.issuer = "";
-    sys.issueDate = new Date();
-    sys.clientId = "";
-    if (cont.isModified()) 
+    var sys = {}
+    if (cont.sys != undefined)
     {
-        cont.sys.lastUpdater= "";
-        cont.sys.lastUpdateTime = new Date();
+            sys = cont.sys;
+            sys.lastUpdater= "";
+            sys.lastUpdateTime = new Date();
     }
+    else
+    {
+        sys.id = this.id;
+        sys.type = "contentType";
+        sys.issuer = "";
+        sys.issueDate = new Date();
+        sys.clientId = "";
+    }
+    
     cont.sys = sys;
     next();
 });

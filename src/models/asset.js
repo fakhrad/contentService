@@ -14,28 +14,33 @@ var asset = new Schema({
 });
 
 asset.pre('save', function(next) {
-    var asset = this;
     ///Initiate sys field
-    var sys = new sysfld();
-    asset.sys.id = this.id;
-    asset.sys.type = "asset";
-    asset.sys.issuer = "";
-    asset.sys.issueDate = new Date();
-    asset.sys.clientId = "";
-    if (asset.isModified()) 
+    var cont = this;
+    var sys = {}
+    if (cont.sys != undefined)
     {
-        asset.sys.lastUpdater= "";
-        asset.sys.lastUpdateTime = new Date();
+            sys = cont.sys;
+            sys.lastUpdater= "";
+            sys.lastUpdateTime = new Date();
     }
+    else
+    {
+        sys.id = this.id;
+        sys.type = "asset";
+        sys.issuer = "";
+        sys.issueDate = new Date();
+        sys.clientId = "";
 
-    //initiate status
-    var newStatus = new status();
-    newStatus.code = "draft";
-    newStatus.applyDate = new Date();
-    newStatus.user = "";
-    newStatus.description = "Item created";
-    this.status = "draft";
-    this.statusLog.push(newStatus);
+        //initiate status
+        var newStatus = new status();
+        newStatus.code = "draft";
+        newStatus.applyDate = new Date();
+        newStatus.user = "";
+        newStatus.description = "Item created";
+        this.status = "draft";
+        this.statusLog.push(newStatus);
+    }
+    cont.sys = sys;
 
     next();
 });
