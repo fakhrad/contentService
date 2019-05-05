@@ -14,22 +14,6 @@ var asset = new Schema({
     statusLog : [Status]
 });
 
-asset.pre('save', function(next) {
-    ///Initiate sys field
-    var cont = this;
-    if (cont.sys != undefined)
-    {
-            sys = cont.sys;
-            sys.lastUpdater= "";
-            sys.lastUpdateTime = new Date();
-    }
-    //initiate status
-    
-
-    cont.sys = sys;
-    next();
-});
-
 asset.methods.publish = function(user, description, cb) {
     if (this.status != "published")
     {
@@ -50,24 +34,24 @@ asset.methods.unPublish = function(cb) {
     if (this.status === "published" && this.statusLog.length > 0)
     {
         this.statusLog.pop();
-        this.status = this.statusLog[statusLog.length - 1].code;
+        this.status = this.statusLog[this.statusLog.length - 1].code;
         this.save(cb);
     }
     else
         cb("Error in unPublishing item!");
 };
 
-asset.methods.archive = function(cb) {
+asset.methods.archive = function(user, description, cb) {
     if (this.status != "archived")
     {
-        var newStatus = new status();
+        var newStatus = {};
         newStatus.code = "archived";
         newStatus.applyDate = new Date();
         newStatus.user = user;
         newStatus.description = description;
         this.status = "archived";
         this.statusLog.push(newStatus);
-        cb(newStatus);
+        this.save(cb);
     }
     else
         cb("Item already archived!");
@@ -77,7 +61,7 @@ asset.methods.unArchive = function(cb) {
     if (this.status === "archived" && this.statusLog.length > 0)
     {
         this.statusLog.pop();
-        this.status = this.statusLog[statusLog.length - 1].code;
+        this.status = this.statusLog[this.statusLog.length - 1].code;
         this.save(cb);
     }
     else

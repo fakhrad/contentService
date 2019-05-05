@@ -108,7 +108,7 @@ var addAsset = function(req, cb)
     var newStatus = {}
     newStatus.code = "draft";
     newStatus.applyDate = new Date();
-    newStatus.user = "";
+    newStatus.user = req.userId;
     newStatus.description = "Item created";
     asset.status = "draft";
     asset.statusLog.push(newStatus);
@@ -184,7 +184,7 @@ var deleteAsset = function(req, cb)
 
 var updateAsset = function(req, cb)
 {
-    console.log(req);
+    console.log("asset update started")
      Assets.findById(req.body.id).exec(function(err, asset){
         var result = {success : false, data : null, error : null };
         if (err)
@@ -202,6 +202,21 @@ var updateAsset = function(req, cb)
             asset.fileType = req.body.fileType,
             asset.description = req.body.description,
             asset.url = req.body.url
+
+            if (asset.status != "draft")
+            {
+                var newStatus = {}
+                newStatus.code = "changed";
+                newStatus.applyDate = new Date();
+                newStatus.user = req.userId;
+                newStatus.description = "Item updated";
+                asset.status = "changed";
+                asset.statusLog.push(newStatus);
+            }
+            asset.sys.lastUpdater = req.userId;
+            asset.sys.lastUpdateTime = new Date();
+            console.log(req);
+            
             asset.save(function(err){
                 if(err)
                 {
@@ -335,7 +350,7 @@ var archiveAsset = function(req, cb)
         }
         if (asset)
         {
-            asset.archive(function(err){
+            asset.archive(req.userId, req.body.description, function(err){
                 if(err)
                 {
                     result.success = false;
