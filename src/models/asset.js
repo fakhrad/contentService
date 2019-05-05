@@ -42,7 +42,7 @@ asset.pre('save', function(next) {
 asset.methods.publish = function(user, description, cb) {
     if (this.status != "published")
     {
-        var newStatus = new status();
+        var newStatus = {}
         newStatus.code = "published";
         newStatus.applyDate = new Date();
         newStatus.user = user;

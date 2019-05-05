@@ -235,12 +235,21 @@ var publishAsset = function(req, cb)
         }
         if (asset)
         {
+            console.log(req);
             asset.publish(req.body.userId, req.body.description, function(err){
                 if(err)
                 {
                     result.success = false;
                     result.data =  undefined;
                     result.error = err;
+                    cb(result);       
+                    return; 
+                }
+                else
+                {
+                    result.success = true;
+                    result.data =  asset;
+                    result.error = undefined;
                     cb(result);       
                     return; 
                 }
@@ -280,6 +289,14 @@ var unPublishAsset = function(req, cb)
                     cb(result);       
                     return; 
                 }
+                else
+                {
+                    result.success = true;
+                    result.data =  asset;
+                    result.error = undefined;
+                    cb(result);       
+                    return; 
+                }
             });
             return;
         }
@@ -316,6 +333,14 @@ var archiveAsset = function(req, cb)
                     cb(result);       
                     return; 
                 }
+                else
+                {
+                    result.success = true;
+                    result.data =  asset;
+                    result.error = undefined;
+                    cb(result);       
+                    return; 
+                }
             });
             return;
         }
@@ -349,6 +374,14 @@ var unArchiveAsset = function(req, cb)
                     result.success = false;
                     result.data =  undefined;
                     result.error = err;
+                    cb(result);       
+                    return; 
+                }
+                else
+                {
+                    result.success = true;
+                    result.data =  asset;
+                    result.error = undefined;
                     cb(result);       
                     return; 
                 }
