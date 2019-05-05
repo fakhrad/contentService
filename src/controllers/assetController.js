@@ -62,6 +62,7 @@ var addAsset = function(req, cb)
     var asset = new Assets({
         sys : {},
         name: req.body.name,
+        title : req.body.title,
         fileType: req.body.fileType,
         description: req.body.description,
         url : req.body.url
@@ -151,6 +152,7 @@ var updateAsset = function(req, cb)
         if (asset)
         {
             asset.name =  req.body.name,
+            asset.title = req.body.title;
             asset.fileType = req.body.fileType,
             asset.description = req.body.description,
             asset.url = req.body.url

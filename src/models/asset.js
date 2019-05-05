@@ -5,7 +5,8 @@ var Schema = mongoose.Schema;
  
 var asset = new Schema({
     sys : {type : sysfld, required : true},
-    name : {type : Object, required:true},
+    name : {type : String, required:true},
+    title : {type : Object, required : true},
     description : {type : Object},
     url : {type : Object},
     fileType : {type: Object},
