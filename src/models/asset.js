@@ -35,7 +35,7 @@ asset.pre('save', function(next) {
         this.statusLog.push(newStatus);
     }
     cont.sys = sys;
-
+    cont.statusLog = [];
     next();
 });
 
