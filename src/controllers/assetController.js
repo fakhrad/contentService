@@ -1,4 +1,5 @@
 const Assets = require('../models/asset');
+const Status = require('../models/status');
 
 var findAll = function(req, cb)
 {
@@ -100,14 +101,24 @@ var addAsset = function(req, cb)
         title : req.body.title,
         fileType: req.body.fileType,
         description: req.body.description,
-        url : req.body.url
+        url : req.body.url,
+        statusLog : []
     });
+
+    var newStatus = {}
+    newStatus.code = "draft";
+    newStatus.applyDate = new Date();
+    newStatus.user = "";
+    newStatus.description = "Item created";
+    asset.status = "draft";
+    asset.statusLog.push(newStatus);
 
     asset.sys.type = "asset";
     asset.sys.spaceId = req.spaceid;
     asset.sys.issuer = req.userId;
     asset.sys.issueDate = new Date();
     asset.sys.spaceId = req.spaceId;
+
     asset.save(function(err){
         var result = {success : false, data : null, error : null };
         if (err)

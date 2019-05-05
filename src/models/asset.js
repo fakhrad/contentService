@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var sysfld = require('./sys');
-var status = require('./status');
+var Status = require('./status');
 var Schema = mongoose.Schema;
  
 var asset = new Schema({
@@ -11,7 +11,7 @@ var asset = new Schema({
     url : {type : Object},
     fileType : {type: Object},
     status : {type : String, enum : ['draft', 'published', 'changed', 'archived'], default : 'draft'},
-    statusLog : [status]
+    statusLog : [Status]
 });
 
 asset.pre('save', function(next) {
@@ -23,19 +23,10 @@ asset.pre('save', function(next) {
             sys.lastUpdater= "";
             sys.lastUpdateTime = new Date();
     }
-    else
-    {
-        //initiate status
-        var newStatus = new status();
-        newStatus.code = "draft";
-        newStatus.applyDate = new Date();
-        newStatus.user = "";
-        newStatus.description = "Item created";
-        this.status = "draft";
-        this.statusLog.push(newStatus);
-    }
+    //initiate status
+    
+
     cont.sys = sys;
-    cont.statusLog = [];
     next();
 });
 
