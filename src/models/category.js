@@ -15,20 +15,11 @@ var category = new Schema({
 
 category.pre('save', function(next) {
     var cont = this;
-    var sys = {}
     if (cont.sys != undefined)
     {
             sys = cont.sys;
             sys.lastUpdater= "";
             sys.lastUpdateTime = new Date();
-    }
-    else
-    {
-        sys.id = this.id;
-        sys.type = "category";
-        sys.issuer = "";
-        sys.issueDate = new Date();
-        sys.clientId = "";
     }
     cat.sys = sys;
     next();

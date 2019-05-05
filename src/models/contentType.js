@@ -16,25 +16,14 @@ var contentType = new Schema({
 });
 
 contentType.pre('save', function(next) {
-
     console.log('sys initiated')
     var cont = this;
-    var sys = {}
     if (cont.sys != undefined)
     {
             sys = cont.sys;
             sys.lastUpdater= "";
             sys.lastUpdateTime = new Date();
     }
-    else
-    {
-        sys.id = this.id;
-        sys.type = "contentType";
-        sys.issuer = "";
-        sys.issueDate = new Date();
-        sys.clientId = "";
-    }
-    
     cont.sys = sys;
     next();
 });

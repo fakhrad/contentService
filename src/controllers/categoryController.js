@@ -1,4 +1,5 @@
 var Category = require('../models/category'); 
+var sys = require('../models/sys'); 
 var async = require('async')
 
 function buildTree(parent, list, contentTypes)
@@ -31,8 +32,8 @@ var getcatgories = function(req, cb)
 {
     async.parallel(
         {
-            categories : function(callback) {Category.find({clientId : req.clientId}).exec(callback)},
-            contentTypes : function(callback) {Product.find({clientId : req.clientId}).exec(callback)}
+            categories : function(callback) {Category.find({spaceId : req.spaceId}).exec(callback)},
+            contentTypes : function(callback) {Product.find({spaceId : req.spaceId}).exec(callback)}
         }, function( err, results){
             var result = {success : false, data : null, error : null };
             if (err)
@@ -55,7 +56,7 @@ var getcatgories = function(req, cb)
                         rootc.push(cat);
                         buildTree(cat, categories, contentTypes);
                     }
-                    cat.clientId = undefined
+                    cat.spaceId = undefined
                     cat.longDesc = undefined;
                 });
                 result.success = true;
@@ -106,7 +107,7 @@ var findById = function(req, cb)
 
 var findByCode = function(req, cb)
 {
-    Category.find({"code" : "^" + req.body.code, "clientId" : req.clientId}).exec(function(err, category){
+    Category.find({"code" : "^" + req.body.code, "spaceId" : req.spaceId}).exec(function(err, category){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -135,7 +136,7 @@ var findByCode = function(req, cb)
 
 var findByParentId = function(req, cb)
 {
-    Category.find({"parentId" : req.body.parentId, "clientId" : req.clientId}).exec(function(err, categories){
+    Category.find({"parentId" : req.body.parentId, "spaceId" : req.spaceId}).exec(function(err, categories){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -158,6 +159,7 @@ var findByParentId = function(req, cb)
 var addCategory = function(req, cb)
 {
     var cat = new Category({
+        sys : {},
         code : req.body.code,
         name : req.body.name,
         shortDesc : req.body.shortDesc,
@@ -165,6 +167,11 @@ var addCategory = function(req, cb)
         parentId : req.body.parentId,
         image : req.body.image
     });
+    cat.sys.type = "category";
+    cat.sys.issuer = req.userId;
+    cat.sys.issueDate = new Date();
+    cat.sys.spaceId = req.spaceId;
+    console.log(cat);
     cat.save(function(err){
         var result = {success : false, data : null, error : null };
         if (err)

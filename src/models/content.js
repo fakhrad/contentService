@@ -15,8 +15,8 @@ var content = new Schema({
 });
 
 content.pre('save', function(next) {
+  ///Initiate sys field
   var cont = this;
-  var sys = {}
   if (cont.sys != undefined)
   {
           sys = cont.sys;
@@ -25,11 +25,6 @@ content.pre('save', function(next) {
   }
   else
   {
-      sys.id = this.id;
-      sys.type = "content";
-      sys.issuer = "";
-      sys.issueDate = new Date();
-      sys.clientId = "";
       //initiate status
       var newStatus = new status();
       newStatus.code = "draft";

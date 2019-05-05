@@ -2,7 +2,7 @@ const Assets = require('../models/asset');
 
 var findAll = function(req, cb)
 {
-    Assets.find({"clientId" : req.clientId}).exec(function(err, Assets){
+    Assets.find({"sys.spaceId" : req.spaceId}).exec(function(err, Assets){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -59,13 +59,19 @@ var findById = function(req, cb)
 
 var addAsset = function(req, cb)
 {
-    var asset = new asset({
+    var asset = new Assets({
+        sys : {},
         name: req.body.name,
         fileType: req.body.fileType,
         description: req.body.description,
         url : req.body.url
     });
 
+    asset.sys.type = "asset";
+    asset.sys.spaceId = req.spaceid;
+    asset.sys.issuer = req.userId;
+    asset.sys.issueDate = new Date();
+    asset.sys.spaceId = req.spaceId;
     asset.save(function(err){
         var result = {success : false, data : null, error : null };
         if (err)
@@ -87,7 +93,7 @@ var addAsset = function(req, cb)
 
 var deleteAsset = function(req, cb)
 {
-     Asset.findById(req.body.id).exec(function(err, asset){
+     Assets.findById(req.body.id).exec(function(err, asset){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -99,7 +105,7 @@ var deleteAsset = function(req, cb)
         }
         if (asset)
         {
-            Asset.deleteOne(asset, function(err){
+            Assets.deleteOne(asset, function(err){
                 if(err)
                 {
                     result.success = false;
@@ -131,7 +137,8 @@ var deleteAsset = function(req, cb)
 
 var updateAsset = function(req, cb)
 {
-     asset.findById(req.body.id).exec(function(err, asset){
+    console.log(req);
+     Assets.findById(req.body.id).exec(function(err, asset){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -156,8 +163,15 @@ var updateAsset = function(req, cb)
                     cb(result);       
                     return; 
                 }
+                else
+                {
+                    result.success = true;
+                    result.data =  asset;
+                    result.error = undefined;
+                    cb(result);       
+                    return; 
+                }
             });
-            return;
         }
         else
         {
@@ -172,7 +186,7 @@ var updateAsset = function(req, cb)
 
 var publishAsset = function(req, cb)
 {
-     Asset.findById(req.body.id).exec(function(err, asset){
+     Assets.findById(req.body.id).exec(function(err, asset){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -208,7 +222,7 @@ var publishAsset = function(req, cb)
 };
 var unPublishAsset = function(req, cb)
 {
-     Asset.findById(req.body.id).exec(function(err, asset){
+     Assets.findById(req.body.id).exec(function(err, asset){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -244,7 +258,7 @@ var unPublishAsset = function(req, cb)
 };
 var archiveAsset = function(req, cb)
 {
-     Asset.findById(req.body.id).exec(function(err, asset){
+     Assets.findById(req.body.id).exec(function(err, asset){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -280,7 +294,7 @@ var archiveAsset = function(req, cb)
 };
 var unArchiveAsset = function(req, cb)
 {
-     Asset.findById(req.body.id).exec(function(err, asset){
+     Assets.findById(req.body.id).exec(function(err, asset){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -314,12 +328,12 @@ var unArchiveAsset = function(req, cb)
         }
     });
 };
-exports.findAll = findAll;
+exports.getAll = findAll;
 exports.findById = findById;
-exports.addAsset = addAsset;
-exports.deleteAsset = deleteAsset;
-exports.updateAsset = updateAsset;
-exports.publishAsset = publishAsset;
-exports.unPublishAsset = unPublishAsset;
-exports.archiveAsset = archiveAsset;
-exports.unArchiveAsset = unArchiveAsset;
+exports.add = addAsset;
+exports.remove = deleteAsset;
+exports.update = updateAsset;
+exports.publish = publishAsset;
+exports.unPublish = unPublishAsset;
+exports.archive = archiveAsset;
+exports.unArchive = unArchiveAsset;

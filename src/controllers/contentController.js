@@ -2,7 +2,7 @@ const Contents = require('../models/content');
 
 var loadContents = function(req, cb)
 {
-    Contents.find({"clientId" : req.clientId}).exec(function(err, contents){
+    Contents.find({"spaceId" : req.spaceId}).exec(function(err, contents){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -31,7 +31,7 @@ var loadContents = function(req, cb)
 
 var findAll = function(req, cb)
 {
-    Contents.find({"clientId" : req.clientId}).exec(function(err, contents){
+    Contents.find({"spaceId" : req.spaceId}).exec(function(err, contents){
         var result = {success : false, data : null, error : null };
         if (err)
         {

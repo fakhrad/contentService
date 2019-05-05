@@ -2,7 +2,7 @@ var ContentTypes = require('../models/contentType');
 
 var getContentTypes = function(req, cb)
 {
-     ContentTypes.find({"clientId" : req.clientId}).exec(function(err, contentTypes){
+     ContentTypes.find({"spaceId" : req.spaceId}).exec(function(err, contentTypes){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -21,7 +21,7 @@ var getContentTypes = function(req, cb)
                 rootc.push(cat);
                 buildTree(cat, contentTypes);
             }
-            cat.clientId = undefined
+            cat.spaceId = undefined
             cat.longDesc = undefined;
         });
         result.data = rootc;
