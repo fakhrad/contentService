@@ -28,6 +28,41 @@ var findAll = function(req, cb)
         }
     });
 };
+
+var filter = function(req, cb)
+{
+    var flt = {};
+    if (req.body.fileType)
+        flt.fileType = req.body.fileType;
+    if (req.body.status)
+        flt.status = req.body.status;
+    Assets.find(flt).exec(function(err, Assets){
+        var result = {success : false, data : null, error : null };
+        if (err)
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = err;
+            cb(result);       
+            return; 
+        }
+        if (Assets)
+        {
+            result.success = true;
+            result.error = undefined;
+            result.data =  Assets;
+            cb(result); 
+        }
+        else
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = undefined;
+            cb(result); 
+        }
+    });
+};
+
 var findById = function(req, cb)
 {
     Assets.findById(req.body.id).exec(function(err, asset){
@@ -339,3 +374,4 @@ exports.publish = publishAsset;
 exports.unPublish = unPublishAsset;
 exports.archive = archiveAsset;
 exports.unArchive = unArchiveAsset;
+exports.filter = filter;
