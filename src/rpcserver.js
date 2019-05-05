@@ -142,6 +142,15 @@ function whenConnected() {
           });
       });
 
+      ch.assertQueue("getassetbyid", {durable: false}, (err, q)=>{
+        ch.consume(q.queue, function reply(msg) {
+            var req = JSON.parse(msg.content.toString('utf8'));
+            assetController.findById(req, (result)=>{
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                ch.ack(msg);
+            });
+          });
+      });
       ch.assertQueue("publishasset", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
