@@ -62,6 +62,7 @@ var addContentTypes = function(req, cb)
 {
     
     var cat = new ContentTypes({
+        sys : {},
         displayName : req.body.displayName,
         name : req.body.name,
         title : req.body.title,
@@ -71,6 +72,12 @@ var addContentTypes = function(req, cb)
         media : req.body.media,
         fields : req.body.fields
     });
+    cat.sys.type = "contentType";
+    cat.sys.spaceId = req.spaceid;
+    cat.sys.issuer = req.userId;
+    cat.sys.issueDate = new Date();
+    cat.sys.spaceId = req.spaceId;
+    console.log(cat);
     cat.save(function(err){
         var result = {success : false, data : null, error : null };
         if (err)

@@ -4,7 +4,7 @@ var sysfld = require('./sys');
 var Schema = mongoose.Schema;
 
 var contentType = new Schema({
-    sys : {type:Object},
+    sys : {type:sysfld},
     name : {type : Object, required : true},
     title : {type : Object, required : true},
     description : {type : Object},
@@ -15,16 +15,4 @@ var contentType = new Schema({
     status : {type : Boolean, required : true, default : true}
 });
 
-contentType.pre('save', function(next) {
-    console.log('sys initiated')
-    var cont = this;
-    if (cont.sys != undefined)
-    {
-            sys = cont.sys;
-            sys.lastUpdater= "";
-            sys.lastUpdateTime = new Date();
-    }
-    cont.sys = sys;
-    next();
-});
 module.exports = mongoose.model("ContentType", contentType);
