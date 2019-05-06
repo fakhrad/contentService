@@ -4,7 +4,7 @@ var Status = require('./status');
 var Schema = mongoose.Schema;
  
 var asset = new Schema({
-    sys : {type : sysfld, required : true},
+    sys : {type : Object, required : true},
     name : {type : String, required:true},
     title : {type : Object, required : true},
     description : {type : Object},

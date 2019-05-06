@@ -4,7 +4,7 @@ var sysfld = require('./sys');
 var Schema = mongoose.Schema;
 
 var contentType = new Schema({
-    sys : {type:sysfld},
+    sys : {type:Object, required : true},
     name : {type : Object, required : true},
     title : {type : Object, required : true},
     description : {type : Object},

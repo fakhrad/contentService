@@ -2,7 +2,7 @@ var ContentTypes = require('../models/contentType');
 
 var getContentTypes = function(req, cb)
 {
-     ContentTypes.find({"spaceId" : req.spaceId}).exec(function(err, contentTypes){
+     ContentTypes.find({"spaceId" : req.spaceid}).exec(function(err, contentTypes){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -14,17 +14,7 @@ var getContentTypes = function(req, cb)
         }
         result.success = true;
         result.error = undefined;
-        var rootc = [];
-        categories.forEach(cat => {
-            if (cat.parentId === undefined)
-            {
-                rootc.push(cat);
-                buildTree(cat, contentTypes);
-            }
-            cat.spaceId = undefined
-            cat.longDesc = undefined;
-        });
-        result.data = rootc;
+        result.data = contentTypes;
         cb(result); 
     });
 };
@@ -159,7 +149,7 @@ var updateContentType = function(req, cb)
 };
 var deleteContentTypes = function(req, cb)
 {
-     ContentTypes.findByIdAndDelete(req.body.id).exec(function(err, result){
+    ContentTypes.findById(req.body.id).exec(function(err, contentType){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -168,6 +158,27 @@ var deleteContentTypes = function(req, cb)
             result.error = err;
             cb(result);       
             return; 
+        }
+        if (contentType)
+        {
+            ContentTypes.deleteOne(contentType, function(err){
+                if(err)
+                {
+                    result.success = false;
+                    result.data =  undefined;
+                    result.error = err;
+                    cb(result);       
+                    return; 
+                }
+                //Successfull. 
+                //Publish user account deleted event
+                result.success = true;
+                result.data =  {"message" : "Deleted successfully"};
+                result.error = undefined;
+                cb(result);       
+                return; 
+            });
+            return;
         }
         else
         {
