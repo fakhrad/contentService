@@ -3,6 +3,18 @@ const Status = require('../models/status');
 
 var findAll = function(req, cb)
 {
+    if (!req.spaceId)
+    {
+        var result = {success : false, data : null, error : null };
+        if (err)
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = err;
+            cb(result);       
+            return; 
+        }
+    }
     Assets.find({"sys.spaceId" : req.spaceId}).exec(function(err, assets){
         console.log(assets);
         var result = {success : false, data : null, error : null };
@@ -33,13 +45,16 @@ var findAll = function(req, cb)
 
 var filter = function(req, cb)
 {
-    var flt = {};
+    var flt = {
+        'sys.spaceId' : req.spaceId
+    };
     if (req.body.fileType)
         flt.fileType = req.body.fileType;
     if (req.body.status)
         flt.status = req.body.status;
-    flt.sys = {};
-    flt.sys.spaceId = req.spaceId;
+    // flt.sys = {};
+    // flt.sys.spaceId = req.spaceId;
+    console.log(flt);
     Assets.find(flt).exec(function(err, Assets){
         var result = {success : false, data : null, error : null };
         if (err)
