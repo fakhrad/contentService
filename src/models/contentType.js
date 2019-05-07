@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-var field = require('./field');
+//var field = require('./field');
 var sysfld = require('./sys');
 var Schema = mongoose.Schema;
 
