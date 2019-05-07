@@ -11,6 +11,9 @@ var contentType = new Schema({
     versioning : {type : Boolean, default : true},
     template : {type : String, required : true},
     media : [Object],
+    allowCustomFields : {type : Boolean, default : false},
+    accessRight : {type : Boolean, default : false},
+    categorization : {type : Boolean, default : true},
     fields : [field],
     status : {type : Boolean, required : true, default : true}
 });

@@ -60,6 +60,9 @@ var addContentTypes = function(req, cb)
         versioning : req.body.versioning,
         template : req.body.template,
         media : req.body.media,
+        allowCustomFields : req.body.allowCustomFields,
+        accessRight : req.body.accessRight,
+        categorization : req.body.categorization,
         fields : req.body.fields
     });
     cat.sys.type = "contentType";
@@ -108,6 +111,9 @@ var updateContentType = function(req, cb)
             contentType.versioning = req.body.versioning;
             contentType.template = req.body.template;
             contentType.media = req.body.media;
+            contentType.allowCustomFields = req.body.allowCustomFields,
+            contentType.accessRight = req.body.accessRight;
+            contentType.categorization = req.body.categorization,
             contentType.fields = req.body.fields;
             contentType.save(function(err){
                 if(err)
