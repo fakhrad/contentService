@@ -3,25 +3,24 @@ var sysfld = require('./sys');
 var Schema = mongoose.Schema;
  
 var category = new Schema({
-    sys : {type : sysfld, required : true},
+    sys : {type : Object, required : true},
     code : {type:Number},
     name : {type : Object, required:true},
     shortDesc : {type : Object},
     longDesc : {type : Object},
     image : {type : Object},
-    parentId : { type: Schema.Types.ObjectId, ref: 'Category' },
-    contentTypes : [Object]
+    parentId : { type: Schema.Types.ObjectId, ref: 'Category' }
 });
-
-category.pre('save', function(next) {
-    var cont = this;
-    if (cont.sys != undefined)
-    {
-            sys = cont.sys;
-            sys.lastUpdater= "";
-            sys.lastUpdateTime = new Date();
+category.methods.viewModel = function(){
+    return{
+        id : this._id,
+        sys : this.sys,
+        code : this.code,
+        name : this.name,
+        shortDesc : this.shortDesc,
+        image : this.image,
+        childs : [],
+        parentId : this.parentId
     }
-    cat.sys = sys;
-    next();
-});
+}
 module.exports = mongoose.model("Category", category);

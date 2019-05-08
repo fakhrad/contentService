@@ -295,7 +295,7 @@ function whenConnected() {
       ch.assertQueue("removecategory", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
-            categoriesController.removecategory(req, (result)=>{
+            categoriesController.deletecategory(req, (result)=>{
                 ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                 ch.ack(msg);
             });

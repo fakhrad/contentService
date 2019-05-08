@@ -2,28 +2,16 @@ var Category = require('../models/category');
 var sys = require('../models/sys'); 
 var async = require('async')
 
-function buildTree(parent, list, contentTypes)
+function buildTree(parent, list)
 {
-    if (parent == undefined || list == undefined || (list != undefined && list.length == 0))
+    if (parent == undefined || parent == null || list == undefined || (list != undefined && list.length == 0))
         return;
-    parent.items = [];
-    parent.data = [];
+    parent.childs = [];
     list.forEach(cat => {
         if (cat.parentId == parent.id)
         {
             parent.items.push(cat);
-            parent.data = [];
-            buildTree(cat, list, products);
-        }
-    });
-    contentTypes.forEach(ct => {
-        if (ct.categoryId == parent.id)
-        {
-            var obj = {};
-            obj.sys = ct.sys;
-            obj.name = ct.name;
-            obj.displayName = ct.displayName;
-            parent.data.push(obj);
+            buildTree(cat, list);
         }
     });
 }
@@ -32,8 +20,7 @@ var getcatgories = function(req, cb)
 {
     async.parallel(
         {
-            categories : function(callback) {Category.find({spaceId : req.spaceId}).exec(callback)},
-            contentTypes : function(callback) {Product.find({spaceId : req.spaceId}).exec(callback)}
+            categories : function(callback) {Category.find({"sys.spaceId" : req.spaceId}).exec(callback)},
         }, function( err, results){
             var result = {success : false, data : null, error : null };
             if (err)
@@ -44,19 +31,18 @@ var getcatgories = function(req, cb)
                 cb(result);       
                 return; 
             }
-            var categories = results.categories;
             var rootc = [];
-            var contentTypes = results.contentTypes;
-            
-            if (contentTypes && categories)
+            var categories = results.categories;
+            console.log(categories);
+            if (categories)
             {
-                categories.forEach(cat => {
-                    if (cat.parentId === undefined)
+                categories.forEach(category => {
+                    var cat =category.viewModel();
+                    if (cat.parentId === undefined || cat.parentId === null)
                     {
                         rootc.push(cat);
-                        buildTree(cat, categories, contentTypes);
+                        buildTree(cat, categories);
                     }
-                    cat.spaceId = undefined
                     cat.longDesc = undefined;
                 });
                 result.success = true;
@@ -92,7 +78,7 @@ var findById = function(req, cb)
         {
             result.success = true;
             result.error = undefined;
-            result.data =  category;
+            result.data =  category.viewModel();
             cb(result); 
         }
         else
@@ -121,7 +107,7 @@ var findByCode = function(req, cb)
         {
             result.success = true;
             result.error = undefined;
-            result.data =  category;
+            result.data =  category.viewModel();
             cb(result); 
         }
         else
@@ -171,7 +157,6 @@ var addCategory = function(req, cb)
     cat.sys.issuer = req.userId;
     cat.sys.issueDate = new Date();
     cat.sys.spaceId = req.spaceId;
-    console.log(cat);
     cat.save(function(err){
         var result = {success : false, data : null, error : null };
         if (err)
@@ -179,21 +164,21 @@ var addCategory = function(req, cb)
             result.success = false;
             result.data =  undefined;
             result.error = err;
+            console.log(result);
             cb(result);       
             return; 
         }
         //Successfull. 
-        //Publish product registered event
         result.success = true;
         result.error = undefined;
-        result.data =  cat;
+        result.data =  cat.viewModel();
         cb(result); 
     });
 };
 
 var deleteCategory = function(req, cb)
 {
-     Category.findByIdAndDelete(req.body.id).exec(function(err, result){
+    Category.findById(req.body.id).exec(function(err, category){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -205,11 +190,33 @@ var deleteCategory = function(req, cb)
         }
         else
         {
-            result.success = false;
-            result.data =  undefined;
-            result.error = undefined;
-            cb(result);       
-            return; 
+            if (!category)
+            {
+                result.success = false;
+                result.data =  undefined;
+                result.error = undefined;
+                cb(result);       
+                return; 
+            }
+            Category.remove({_id : req.body.id}, (err)=>{
+                var result = {success : false, data : null, error : null };
+                if (err)
+                {
+                    result.success = false;
+                    result.data =  undefined;
+                    result.error = err;
+                    cb(result);       
+                    return; 
+                }
+                else
+                {
+                    result.success = true;
+                    result.data =  undefined;
+                    result.error = undefined;
+                    cb(result);       
+                    return; 
+                }
+            });
         }
     });
 };
@@ -257,7 +264,7 @@ var updateCategory = function(req, cb)
                     }
                     result.success = true;
                     result.error = undefined;
-                    result.data =  category;
+                    result.data =  category.viewModel();
                     cb(result); 
                 });
             });
@@ -273,7 +280,7 @@ var updateCategory = function(req, cb)
         }
     });
 };
-exports.getcatgories = getcatgories;
+exports.getcategories = getcatgories;
 exports.findbyid = findById;
 exports.findbycode = findByCode;
 exports.findbyparentid = findByParentId;
