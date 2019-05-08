@@ -59,57 +59,58 @@ var addContentTypes = function(req, cb)
         cb(result);       
         return; 
     }  
-    ContentTypes.find({"sys.spaceId" : req.spaceId, name : req.body.name}).exec((err, res)=>{
-        if (err || res)
+    var cat = new ContentTypes({
+        sys : {},
+        displayName : req.body.displayName,
+        name : req.body.name,
+        title : req.body.title,
+        description : req.body.description,
+        versioning : req.body.versioning,
+        template : req.body.template,
+        media : req.body.media,
+        allowCustomFields : req.body.allowCustomFields,
+        accessRight : req.body.accessRight,
+        categorization : req.body.categorization,
+        fields : req.body.fields
+    });
+    cat.sys.type = "contentType";
+    cat.sys.spaceId = req.spaceid;
+    cat.sys.issuer = req.userId;
+    cat.sys.issueDate = new Date();
+    cat.sys.spaceId = req.spaceId;
+    console.log(cat);
+    cat.save(function(err){
+        if (err)
         {
-            console.log(res);
             result.success = false;
             result.data =  undefined;
-            result.error = "Name must be unique.";
+            result.error = err;
+            console.log(err);
             cb(result);       
             return; 
-        } 
-        else
-        {
-            var cat = new ContentTypes({
-                sys : {},
-                displayName : req.body.displayName,
-                name : req.body.name,
-                title : req.body.title,
-                description : req.body.description,
-                versioning : req.body.versioning,
-                template : req.body.template,
-                media : req.body.media,
-                allowCustomFields : req.body.allowCustomFields,
-                accessRight : req.body.accessRight,
-                categorization : req.body.categorization,
-                fields : req.body.fields
-            });
-            cat.sys.type = "contentType";
-            cat.sys.spaceId = req.spaceid;
-            cat.sys.issuer = req.userId;
-            cat.sys.issueDate = new Date();
-            cat.sys.spaceId = req.spaceId;
-            console.log(cat);
-            cat.save(function(err){
-                if (err)
-                {
-                    result.success = false;
-                    result.data =  undefined;
-                    result.error = err;
-                    console.log(err);
-                    cb(result);       
-                    return; 
-                }
-                //Successfull. 
-                //Publish product registered event
-                result.success = true;
-                result.error = undefined;
-                result.data =  cat;
-                cb(result); 
-            });
-        } 
-    }); 
+        }
+        //Successfull. 
+        //Publish product registered event
+        result.success = true;
+        result.error = undefined;
+        result.data =  cat;
+        cb(result); 
+    });
+    // ContentTypes.find({"sys.spaceId" : req.spaceId, name : req.body.name}).exec((err, res)=>{
+    //     if (err || res)
+    //     {
+    //         console.log(res);
+    //         result.success = false;
+    //         result.data =  undefined;
+    //         result.error = "Name must be unique.";
+    //         cb(result);       
+    //         return; 
+    //     } 
+    //     else
+    //     {
+            
+    //     } 
+    // }); 
 };
 
 var updateContentType = function(req, cb)
