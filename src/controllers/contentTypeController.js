@@ -2,7 +2,7 @@ var ContentTypes = require('../models/contentType');
 
 var getContentTypes = function(req, cb)
 {
-     ContentTypes.find({"spaceId" : req.spaceid}).exec(function(err, contentTypes){
+     ContentTypes.find({"sys.spaceId" : req.spaceid}).exec(function(err, contentTypes){
         var result = {success : false, data : null, error : null };
         if (err)
         {
