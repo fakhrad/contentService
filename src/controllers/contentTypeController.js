@@ -2,7 +2,7 @@ var ContentTypes = require('../models/contentType');
 
 var getContentTypes = function(req, cb)
 {
-     ContentTypes.find({"sys.spaceId" : req.spaceid}).exec(function(err, contentTypes){
+     ContentTypes.find({"sys.spaceId" : req.spaceId}).exec(function(err, contentTypes){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -59,9 +59,10 @@ var addContentTypes = function(req, cb)
         cb(result);       
         return; 
     }  
-    ContentTypes.find({spaceId : req.spaceId, name : req.body.name}).exec((err, res)=>{
-        if (res)
+    ContentTypes.find({"sys.spaceId" : req.spaceId, name : req.body.name}).exec((err, res)=>{
+        if (err || res)
         {
+            console.log(res);
             result.success = false;
             result.data =  undefined;
             result.error = "Name must be unique.";
