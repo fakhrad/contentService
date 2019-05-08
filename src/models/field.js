@@ -6,6 +6,7 @@ var field = new Schema({
     title : {type : Object, required : true},
     desc : {type : Object},
     type : {type : Object, required : true},
+    isBase : {type : Boolean, default : false},
     localize : {type : Boolean, default : false}
 }, { toJSON: { virtuals: true } });
   
