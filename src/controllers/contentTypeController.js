@@ -187,7 +187,7 @@ var deleteContentTypes = function(req, cb)
         }
         if (contentType)
         {
-            ContentTypes.deleteOne(contentType, function(err){
+            ContentTypes.remove({_id : contentType._id}, function(err){
                 if(err)
                 {
                     result.success = false;
