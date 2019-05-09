@@ -5,8 +5,8 @@ const ctypeController = require('./controllers/contentTypeController');
 const assetController = require('./controllers/assetController');
 const categoriesController = require('./controllers/categoryController');
 
-var rabbitHost = process.env.RABBITMQ_HOST || "amqp://gvgeetrh:6SyWQAxDCpcdg1S0Dc-Up0sUxfmBUVZU@chimpanzee.rmq.cloudamqp.com/gvgeetrh";
-//var rabbitHost = process.env.RABBITMQ_HOST || "amqp://localhost:5672";
+var rabbitHost = process.env.RABBITMQ_HOST || "amqp://fwhebseo:Q3Ft5NUyFNBniua53p_bV8u-w3KVfmsK @wildboar.rmq.cloudamqp.com/fwhebseo ";
+var rabbitHost = process.env.RABBITMQ_HOST || "amqp://localhost:5672";
 
 var amqpConn = null;
 function start() {
@@ -36,15 +36,15 @@ function whenConnected() {
     amqpConn.createChannel( (err, ch) => {
         if (err) {
             console.error("[AMQP]", err.message);
-            return setTimeout(start, 1000);
+            //return setTimeout(start, 1000);
         }
         ch.on("error", function(err) {
         console.error("[AMQP] channel error", err.message);
-        return setTimeout(start, 1000);
+        //return setTimeout(start, 1000);
         });
         ch.on("close", function() {
         console.log("[AMQP] channel closed");
-        return setTimeout(start, 1000);
+        //return setTimeout(start, 1000);
         });
         console.log('Client connected.');
         this.channel = ch;
@@ -55,7 +55,7 @@ function whenConnected() {
       ch.assertQueue("getcontents", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
-              contentController.getcontents(req, (result)=>{
+              contentController.getAll(req, (result)=>{
                   ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
                   ch.ack(msg);
               });

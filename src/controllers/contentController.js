@@ -2,7 +2,7 @@ const Contents = require('../models/content');
 
 var loadContents = function(req, cb)
 {
-    Contents.find({"spaceId" : req.spaceId}).exec(function(err, contents){
+    Contents.find({"sys.spaceId" : req.spaceId}).exec(function(err, contents){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -31,7 +31,7 @@ var loadContents = function(req, cb)
 
 var findAll = function(req, cb)
 {
-    Contents.find({"spaceId" : req.spaceId}).exec(function(err, contents){
+    Contents.find({"sys.spaceId" : req.spaceId}).exec(function(err, contents){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -88,11 +88,28 @@ var findById = function(req, cb)
 
 var addContent = function(req, cb)
 {
-    var content = new Content({
+    var content = new Contents({
+        sys : {},
         fields: req.body.fields,
         contentType : req.body.contentType,
-        category : req.body.category
+        category : req.body.category,
+        status : "draft",
+        statusLog : []
     });
+
+    var newStatus = {}
+    newStatus.code = "draft";
+    newStatus.applyDate = new Date();
+    newStatus.user = req.userId;
+    newStatus.description = "Item created";
+    content.status = "draft";
+    content.statusLog.push(newStatus);
+
+    content.sys.type = "content";
+    content.sys.spaceId = req.spaceid;
+    content.sys.issuer = req.userId;
+    content.sys.issueDate = new Date();
+    content.sys.spaceId = req.spaceId;
 
     content.save(function(err){
         var result = {success : false, data : null, error : null };
@@ -173,6 +190,18 @@ var updateContent = function(req, cb)
         {
             content.fields = req.body.fields;
             content.category = req.body.catgory;
+            if (content.status != "draft")
+            {
+                var newStatus = {}
+                newStatus.code = "changed";
+                newStatus.applyDate = new Date();
+                newStatus.user = req.userId;
+                newStatus.description = "Item updated";
+                content.status = "changed";
+                content.statusLog.push(newStatus);
+            }
+            content.sys.lastUpdater = req.userId;
+            content.sys.lastUpdateTime = new Date();
             content.save(function(err){
                 if(err)
                 {
@@ -226,12 +255,21 @@ var publishContent = function(req, cb)
         }
         if (content)
         {
+            console.log(req);
             content.publish(req.body.userId, req.body.description, function(err){
                 if(err)
                 {
                     result.success = false;
                     result.data =  undefined;
                     result.error = err;
+                    cb(result);       
+                    return; 
+                }
+                else
+                {
+                    result.success = true;
+                    result.data =  content;
+                    result.error = undefined;
                     cb(result);       
                     return; 
                 }
@@ -271,6 +309,14 @@ var unPublishContent = function(req, cb)
                     cb(result);       
                     return; 
                 }
+                else
+                {
+                    result.success = true;
+                    result.data =  content;
+                    result.error = undefined;
+                    cb(result);       
+                    return; 
+                }
             });
             return;
         }
@@ -298,12 +344,20 @@ var archiveContent = function(req, cb)
         }
         if (content)
         {
-            content.archive(function(err){
+            content.archive(req.userId, req.body.description, function(err){
                 if(err)
                 {
                     result.success = false;
                     result.data =  undefined;
                     result.error = err;
+                    cb(result);       
+                    return; 
+                }
+                else
+                {
+                    result.success = true;
+                    result.data =  content;
+                    result.error = undefined;
                     cb(result);       
                     return; 
                 }
@@ -340,6 +394,14 @@ var unArchiveContent = function(req, cb)
                     result.success = false;
                     result.data =  undefined;
                     result.error = err;
+                    cb(result);       
+                    return; 
+                }
+                else
+                {
+                    result.success = true;
+                    result.data =  content;
+                    result.error = undefined;
                     cb(result);       
                     return; 
                 }

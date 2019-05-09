@@ -6,12 +6,12 @@ var Schema = mongoose.Schema;
 
 var content = new Schema({
     sys : {type:Object, required :true},
-    fields : [Object],
+    fields : {type : Object},
     status : {type : String, enum : ['draft', 'published', 'changed', 'archived'], default : 'draft'},
     statusLog : [status],
     versions : [Object],
     contentType : {type: Schema.Types.ObjectId, ref: 'ContentType' , required : true},
-    category : {type: Schema.Types.ObjectId, ref: 'Category' , required : true}
+    category : {type: Schema.Types.ObjectId, ref: 'Category'}
 });
 
 content.methods.publish = function(user, description, cb) {
