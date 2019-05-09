@@ -5,7 +5,8 @@ const ctypeController = require('./controllers/contentTypeController');
 const assetController = require('./controllers/assetController');
 const categoriesController = require('./controllers/categoryController');
 
-var rabbitHost = process.env.RABBITMQ_HOST || "amqp://gvgeetrh:6SyWQAxDCpcdg1S0Dc-Up0sUxfmBUVZU@chimpanzee.rmq.cloudamqp.com/gvgeetrh";
+//var rabbitHost = process.env.RABBITMQ_HOST || "amqp://gvgeetrh:6SyWQAxDCpcdg1S0Dc-Up0sUxfmBUVZU@chimpanzee.rmq.cloudamqp.com/gvgeetrh";
+var rabbitHost = process.env.RABBITMQ_HOST || "amqp://localhost:5672";
 
 var amqpConn = null;
 function start() {
@@ -39,9 +40,11 @@ function whenConnected() {
         }
         ch.on("error", function(err) {
         console.error("[AMQP] channel error", err.message);
+        return setTimeout(start, 1000);
         });
         ch.on("close", function() {
         console.log("[AMQP] channel closed");
+        return setTimeout(start, 1000);
         });
         console.log('Client connected.');
         this.channel = ch;

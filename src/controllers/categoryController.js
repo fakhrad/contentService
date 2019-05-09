@@ -6,7 +6,7 @@ function buildTree(parent, list)
 {
     if (parent == undefined || parent == null || list == undefined || (list != undefined && list.length == 0))
         return;
-    parent.childs = [];
+    parent.items = [];
     list.forEach(cat => {
         if (cat.parentId == parent.id)
         {

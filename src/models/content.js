@@ -14,33 +14,6 @@ var content = new Schema({
     category : {type: Schema.Types.ObjectId, ref: 'Category' , required : true}
 });
 
-content.pre('save', function(next) {
-  ///Initiate sys field
-  var cont = this;
-  if (cont.sys != undefined)
-  {
-          sys = cont.sys;
-          sys.lastUpdater= "";
-          sys.lastUpdateTime = new Date();
-  }
-  else
-  {
-      //initiate status
-      var newStatus = new status();
-      newStatus.code = "draft";
-      newStatus.applyDate = new Date();
-      newStatus.user = "";
-      newStatus.description = "Item created";
-      this.status = "draft";
-      this.statusLog.push(newStatus);
-  }
-  cont.sys = sys;
-
-  next();
-});
-
-
-
 content.methods.publish = function(user, description, cb) {
   if (this.status != "published")
   {
@@ -93,5 +66,9 @@ content.methods.unArchive = function(cb) {
   }
   else
       cb("Error in unArchiving item!");
+};
+
+content.methods.count = function(cb) {
+    
 };
 module.exports = mongoose.model("Content", content);

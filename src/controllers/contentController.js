@@ -115,7 +115,7 @@ var addContent = function(req, cb)
 
 var deleteContent = function(req, cb)
 {
-     Content.findById(req.body.id).exec(function(err, content){
+     Contents.findById(req.body.id).exec(function(err, content){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -159,7 +159,7 @@ var deleteContent = function(req, cb)
 
 var updateContent = function(req, cb)
 {
-     Content.findById(req.body.id).exec(function(err, content){
+     Contents.findById(req.body.id).exec(function(err, content){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -214,7 +214,7 @@ var updateContent = function(req, cb)
 
 var publishContent = function(req, cb)
 {
-     Content.findById(req.body.id).exec(function(err, content){
+     Contents.findById(req.body.id).exec(function(err, content){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -250,7 +250,7 @@ var publishContent = function(req, cb)
 };
 var unPublishContent = function(req, cb)
 {
-     Content.findById(req.body.id).exec(function(err, content){
+     Contents.findById(req.body.id).exec(function(err, content){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -286,7 +286,7 @@ var unPublishContent = function(req, cb)
 };
 var archiveContent = function(req, cb)
 {
-     Content.findById(req.body.id).exec(function(err, content){
+     Contents.findById(req.body.id).exec(function(err, content){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -322,7 +322,7 @@ var archiveContent = function(req, cb)
 };
 var unArchiveContent = function(req, cb)
 {
-     Content.findById(req.body.id).exec(function(err, content){
+     Contents.findById(req.body.id).exec(function(err, content){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -359,11 +359,11 @@ var unArchiveContent = function(req, cb)
 
 exports.getAll = findAll;
 exports.findById = findById;
-exports.addContent = addContent;
-exports.deleteContent = deleteContent;
-exports.updateContent = updateContent;
-exports.loadContents = loadContents;
-exports.publishContent = publishContent;
-exports.unPublishContent = unPublishContent;
-exports.archiveContent = archiveContent;
-exports.unArchiveContent = unArchiveContent;
+exports.add = addContent;
+exports.delete = deleteContent;
+exports.update = updateContent;
+exports.load = loadContents;
+exports.publish = publishContent;
+exports.unPublish = unPublishContent;
+exports.archive = archiveContent;
+exports.unArchive = unArchiveContent;
