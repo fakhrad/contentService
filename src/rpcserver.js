@@ -6,7 +6,7 @@ const assetController = require('./controllers/assetController');
 const categoriesController = require('./controllers/categoryController');
 
 var rabbitHost = process.env.RABBITMQ_HOST || "amqp://fwhebseo:Q3Ft5NUyFNBniua53p_bV8u-w3KVfmsK @wildboar.rmq.cloudamqp.com/fwhebseo ";
-var rabbitHost = process.env.RABBITMQ_HOST || "amqp://localhost:5672";
+//var rabbitHost = process.env.RABBITMQ_HOST || "amqp://localhost:5672";
 
 var amqpConn = null;
 function start() {
