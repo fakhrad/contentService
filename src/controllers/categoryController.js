@@ -226,7 +226,6 @@ var updateCategory = function(req, cb)
 exports.getcategories = getcatgories;
 exports.findbyid = findById;
 exports.findbycode = findByCode;
-exports.findbyparentid = findByParentId;
 exports.addcategory = addCategory;
 exports.deletecategory = deleteCategory;
 exports.updatecategory = updateCategory;
