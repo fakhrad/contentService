@@ -9,7 +9,7 @@ var category = new Schema({
     shortDesc : {type : Object},
     longDesc : {type : Object},
     image : {type : Object},
-    parentId : { type: Schema.Types.ObjectId, ref: 'Category' },
+    items : [Object]
 });
 category.methods.viewModel = function(){
     return{
@@ -19,8 +19,7 @@ category.methods.viewModel = function(){
         name : this.name,
         shortDesc : this.shortDesc,
         image : this.image,
-        items : [],
-        parentId : this.parentId
+        items : this.items
     }
 }
 module.exports = mongoose.model("Category", category);

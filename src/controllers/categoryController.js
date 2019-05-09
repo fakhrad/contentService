@@ -2,21 +2,6 @@ var Category = require('../models/category');
 var sys = require('../models/sys'); 
 var async = require('async')
 
-function buildTree(parent, list)
-{
-    if (parent == undefined || parent == null || list == undefined || (list != undefined && list.length == 0))
-        return;
-    parent.items = [];
-    list.forEach(category => {
-        var cat =category.viewModel();
-        if (category.parentId == parent._id)
-        {
-            parent.items.push(cat);
-            buildTree(category, list);
-        }
-    });
-}
-
 var getcatgories = function(req, cb)
 {
     async.parallel(
@@ -34,32 +19,11 @@ var getcatgories = function(req, cb)
             }
             var rootc = [];
             var categories = results.categories;
-            console.log(categories);
-            if (categories)
-            {
-                categories.forEach(category => {
-                    if (category.parentId === undefined || category.parentId === null)
-                    {
-                        var cat =category.viewModel();
-                        rootc.push(cat);
-                        buildTree(category, categories);
-                    }
-                    cat.longDesc = undefined;
-                });
-                result.success = true;
-                result.error = undefined;
-                result.data =  rootc;
-                cb(result); 
-            }
-            else
-            {
-                result.success = false;
-                result.data =  undefined;
-                result.error = undefined;
-                cb(result);       
-                return; 
-            }
-
+            result.success = false;
+            result.data =  categories;
+            result.error = undefined;
+            cb(result);       
+            return; 
             });
 };
 
@@ -121,28 +85,6 @@ var findByCode = function(req, cb)
     });
 };
 
-var findByParentId = function(req, cb)
-{
-    Category.find({"parentId" : req.body.parentId, "spaceId" : req.spaceId}).exec(function(err, categories){
-        var result = {success : false, data : null, error : null };
-        if (err)
-        {
-            result.success = false;
-            result.data =  undefined;
-            result.error = err;
-            cb(result);       
-            return; 
-        }
-        else
-        {
-            result.success = true;
-            result.error = undefined;
-            result.data =  categories;
-            cb(result); 
-        }
-    });
-};
-
 var addCategory = function(req, cb)
 {
     var cat = new Category({
@@ -151,7 +93,7 @@ var addCategory = function(req, cb)
         name : req.body.name,
         shortDesc : req.body.shortDesc,
         longDesc : req.body.longDesc,
-        parentId : req.body.parentId,
+        items : req.body.items,
         image : req.body.image
     });
     cat.sys.type = "category";
@@ -240,7 +182,7 @@ var updateCategory = function(req, cb)
             category.name = req.body.name;
             category.shortDesc = req.body.shortDesc;
             category.longDesc = req.body.longDesc;
-            category.parentId = req.body.parentId;
+            category.items = req.body.items;
             category.image = req.body.image;
             category.contentTypes = req.body.contentTypes;
             category.save(function(err){
