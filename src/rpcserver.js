@@ -5,7 +5,7 @@ const ctypeController = require('./controllers/contentTypeController');
 const assetController = require('./controllers/assetController');
 const categoriesController = require('./controllers/categoryController');
 
-var rabbitHost = process.env.RABBITMQ_HOST || "amqp://fwhebseo:Q3Ft5NUyFNBniua53p_bV8u-w3KVfmsK @wildboar.rmq.cloudamqp.com/fwhebseo ";
+var rabbitHost = process.env.RABBITMQ_HOST || "amqp://gvgeetrh:6SyWQAxDCpcdg1S0Dc-Up0sUxfmBUVZU@chimpanzee.rmq.cloudamqp.com/gvgeetrh ";
 //var rabbitHost = process.env.RABBITMQ_HOST || "amqp://localhost:5672";
 
 var amqpConn = null;
