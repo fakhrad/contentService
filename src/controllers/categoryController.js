@@ -7,11 +7,12 @@ function buildTree(parent, list)
     if (parent == undefined || parent == null || list == undefined || (list != undefined && list.length == 0))
         return;
     parent.items = [];
-    list.forEach(cat => {
-        if (cat.parentId == parent.id)
+    list.forEach(category => {
+        var cat =category.viewModel();
+        if (category.parentId == parent._id)
         {
             parent.items.push(cat);
-            buildTree(cat, list);
+            buildTree(category, list);
         }
     });
 }
@@ -37,11 +38,11 @@ var getcatgories = function(req, cb)
             if (categories)
             {
                 categories.forEach(category => {
-                    var cat =category.viewModel();
-                    if (cat.parentId === undefined || cat.parentId === null)
+                    if (category.parentId === undefined || category.parentId === null)
                     {
+                        var cat =category.viewModel();
                         rootc.push(cat);
-                        buildTree(cat, categories);
+                        buildTree(category, categories);
                     }
                     cat.longDesc = undefined;
                 });
