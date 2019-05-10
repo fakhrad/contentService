@@ -145,7 +145,7 @@ var deleteContent = function(req, cb)
         }
         if (content)
         {
-            Content.deleteOne(content, function(err){
+            Contents.remove({_id : content._id}, function(err){
                 if(err)
                 {
                     result.success = false;
@@ -226,7 +226,7 @@ var updateContent = function(req, cb)
                 }
                 //Successfull. 
                 //Publish user profile updated event
-                Content.findById(req.body.id).populate('contentType', "title").populate('category', 'name').exec(function(err, content){
+                Contents.findById(req.body.id).populate('contentType', "title").populate('category', 'name').exec(function(err, content){
                     if(err)
                     {
                         result.success = false;
