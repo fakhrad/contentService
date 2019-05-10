@@ -51,7 +51,7 @@ content.methods.archive = function(user, description, cb) {
       newStatus.description = description;
       this.status = "archived";
       this.statusLog.push(newStatus);
-      cb(newStatus);
+      this.save(cb(undefined));
   }
   else
       cb("Item already archived!");
