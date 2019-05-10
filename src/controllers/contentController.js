@@ -2,7 +2,7 @@ const Contents = require('../models/content');
 
 var loadContents = function(req, cb)
 {
-    Contents.find({"sys.spaceId" : req.spaceId}).exec(function(err, contents){
+    Contents.find({"sys.spaceId" : req.spaceId}).populate('contentType', "title").populate('category', 'name').exec(function(err, contents){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -31,7 +31,7 @@ var loadContents = function(req, cb)
 
 var findAll = function(req, cb)
 {
-    Contents.find({"sys.spaceId" : req.spaceId}).exec(function(err, contents){
+    Contents.find({"sys.spaceId" : req.spaceId}).populate('contentType', "title").populate('category', 'name').exec(function(err, contents){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -59,7 +59,7 @@ var findAll = function(req, cb)
 };
 var findById = function(req, cb)
 {
-    Contents.findById(req.body.id).exec(function(err, content){
+    Contents.findById(req.body.id).populate('contentType', "title").populate('category', 'name').exec(function(err, content){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -225,7 +225,7 @@ var updateContent = function(req, cb)
                 }
                 //Successfull. 
                 //Publish user profile updated event
-                Content.findById(req.body.id).exec(function(err, content){
+                Content.findById(req.body.id).populate('contentType', "title").populate('category', 'name').exec(function(err, content){
                     if(err)
                     {
                         result.success = false;

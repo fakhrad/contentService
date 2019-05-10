@@ -2,7 +2,7 @@ var ContentTypes = require('../models/contentType');
 
 var getContentTypes = function(req, cb)
 {
-     ContentTypes.find({"sys.spaceId" : req.spaceId}).populate('contentType', "title").populate('category', 'name').exec(function(err, contentTypes){
+     ContentTypes.find({"sys.spaceId" : req.spaceId}).exec(function(err, contentTypes){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -21,7 +21,7 @@ var getContentTypes = function(req, cb)
 
 var findById = function(req, cb)
 {
-    ContentTypes.findById(req.body.id).populate('contentType', "title").populate('category', 'name').exec(function(err, contentTypes){
+    ContentTypes.findById(req.body.id).exec(function(err, contentTypes){
         var result = {success : false, data : null, error : null };
         if (err)
         {
