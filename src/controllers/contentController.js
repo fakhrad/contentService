@@ -239,6 +239,7 @@ var updateContent = function(req, cb)
                     result.error = undefined;
                     result.data =  content;
                     cb(result); 
+                    return
                 });
             });
             return;
