@@ -13,6 +13,7 @@ var filter = function(req, cb)
         flt.contentType = req.body.contentType;
     if (req.body.status)
         flt.status = req.body.status;
+    console.log(flt);
     Contents.find(flt).populate('contentType', "title").populate('category', 'name').exec(function(err, contents){
         var result = {success : false, data : null, error : null };
         if (err)
