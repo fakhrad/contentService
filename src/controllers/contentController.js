@@ -1,5 +1,48 @@
 const Contents = require('../models/content');
 
+var filter = function(req, cb)
+{
+    var flt = {
+        'sys.spaceId' : req.spaceId
+    };
+    if (req.body.name)
+        flt.name = req.body.name;
+    if (req.body.category)
+        flt.category = req.body.category;
+    if (req.body.contentType)
+        flt.name = req.body.contentType;
+    if (req.body.status)
+        flt.status = req.body.status;
+    // flt.sys = {};
+    // flt.sys.spaceId = req.spaceId;
+    console.log(flt);
+    Contents.find(flt).exec(function(err, contents){
+        var result = {success : false, data : null, error : null };
+        if (err)
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = err;
+            cb(result);       
+            return; 
+        }
+        if (Assets)
+        {
+            result.success = true;
+            result.error = undefined;
+            result.data =  Assets;
+            cb(result); 
+        }
+        else
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = undefined;
+            cb(result); 
+        }
+    });
+};
+
 var loadContents = function(req, cb)
 {
     Contents.find({"sys.spaceId" : req.spaceId}).populate('contentType', "title").populate('category', 'name')
@@ -434,6 +477,7 @@ var unArchiveContent = function(req, cb)
 };
 
 exports.getAll = findAll;
+exports.filter = filter;
 exports.findById = findById;
 exports.add = addContent;
 exports.delete = deleteContent;
