@@ -170,7 +170,7 @@ var deleteAsset = function(req, cb)
         }
         if (asset)
         {
-            Assets.deleteOne(asset, function(err){
+            Assets.remove({_id : asset._id}, function(err){
                 if(err)
                 {
                     result.success = false;
