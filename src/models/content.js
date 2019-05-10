@@ -41,7 +41,7 @@ content.methods.unPublish = function(cb) {
       cb("Error in unPublishing item!");
 };
 
-content.methods.archive = function(cb) {
+content.methods.archive = function(user, description, cb) {
   if (this.status != "archived")
   {
       var newStatus = {};
