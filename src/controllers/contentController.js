@@ -30,7 +30,7 @@ var filter = function(req, cb)
         {
             result.success = true;
             result.error = undefined;
-            result.data =  Assets;
+            result.data =  contents;
             cb(result); 
         }
         else
