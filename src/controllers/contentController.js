@@ -16,7 +16,7 @@ var filter = function(req, cb)
     // flt.sys = {};
     // flt.sys.spaceId = req.spaceId;
     console.log(flt);
-    Contents.find(flt).exec(function(err, contents){
+    Contents.find(flt).populate('contentType', "title").populate('category', 'name').exec(function(err, contents){
         var result = {success : false, data : null, error : null };
         if (err)
         {
