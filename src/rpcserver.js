@@ -23,7 +23,7 @@ function start() {
     });
     conn.on("close", function() {
       console.error("[AMQP] reconnecting");
-      return setTimeout(start, 1000);
+      //return setTimeout(start, 1000);
     });
 
     console.log("[AMQP] connected");
