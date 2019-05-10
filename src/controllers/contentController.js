@@ -10,12 +10,9 @@ var filter = function(req, cb)
     if (req.body.category)
         flt.category = req.body.category;
     if (req.body.contentType)
-        flt.name = req.body.contentType;
+        flt.contentType = req.body.contentType;
     if (req.body.status)
         flt.status = req.body.status;
-    // flt.sys = {};
-    // flt.sys.spaceId = req.spaceId;
-    console.log(flt);
     Contents.find(flt).populate('contentType', "title").populate('category', 'name').exec(function(err, contents){
         var result = {success : false, data : null, error : null };
         if (err)
