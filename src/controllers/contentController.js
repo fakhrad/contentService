@@ -60,8 +60,7 @@ var findAll = function(req, cb)
 };
 var findById = function(req, cb)
 {
-    console.log(req);
-    Contents.findById(req.body.id).populate('contentType').populate('category', 'name').exec(function(err, content){
+    Contents.findById(req.body.id).populate('contentType').populate('category').exec(function(err, content){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -227,7 +226,7 @@ var updateContent = function(req, cb)
                 }
                 //Successfull. 
                 //Publish user profile updated event
-                Contents.findById(req.body.id).populate('contentType', "title").populate('category', 'name').exec(function(err, content){
+                Contents.findById(req.body.id).populate('contentType').populate('category').exec(function(err, content){
                     if(err)
                     {
                         result.success = false;
