@@ -26,7 +26,7 @@ var filter = function(req, cb)
             cb(result);       
             return; 
         }
-        if (Assets)
+        if (contents)
         {
             result.success = true;
             result.error = undefined;
