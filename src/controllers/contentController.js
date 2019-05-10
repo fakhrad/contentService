@@ -60,7 +60,8 @@ var findAll = function(req, cb)
 };
 var findById = function(req, cb)
 {
-    Contents.findById(req.body.id).populate('contentType', "title").populate('category', 'name').exec(function(err, content){
+    console.log(req);
+    Contents.findById(req.body.id).populate('contentType').populate('category', 'name').exec(function(err, content){
         var result = {success : false, data : null, error : null };
         if (err)
         {
