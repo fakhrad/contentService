@@ -2,7 +2,8 @@ const Contents = require('../models/content');
 
 var loadContents = function(req, cb)
 {
-    Contents.find({"sys.spaceId" : req.spaceId}).populate('contentType', "title").populate('category', 'name').exec(function(err, contents){
+    Contents.find({"sys.spaceId" : req.spaceId}).populate('contentType', "title").populate('category', 'name')
+    .exec(function(err, contents){
         var result = {success : false, data : null, error : null };
         if (err)
         {

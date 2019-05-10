@@ -5,7 +5,7 @@ var status = require('./status');
 var Schema = mongoose.Schema;
 
 var content = new Schema({
-    sys : {type:Object, required :true},
+    sys : {type:sysfld, required :true},
     fields : {type : Object},
     status : {type : String, enum : ['draft', 'published', 'changed', 'archived'], default : 'draft'},
     statusLog : [status],

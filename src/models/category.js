@@ -3,7 +3,7 @@ var sysfld = require('./sys');
 var Schema = mongoose.Schema;
  
 var category = new Schema({
-    sys : {type : Object, required : true},
+    sys : {type : sysfld, required : true},
     code : {type:Number},
     name : {type : Object, required:true},
     shortDesc : {type : Object},

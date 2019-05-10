@@ -4,7 +4,7 @@ var sysfld = require('./sys');
 var Schema = mongoose.Schema;
 
 var contentType = new Schema({
-    sys : {type:Object, required : true},
+    sys : {type:sysfld, required : true},
     name : {type : Object, required : true},
     title : {type : Object, required : true},
     description : {type : Object},
@@ -14,7 +14,7 @@ var contentType = new Schema({
     allowCustomFields : {type : Boolean, default : false},
     accessRight : {type : Boolean, default : false},
     categorization : {type : Boolean, default : true},
-    fields : [Object],
+    fields : [field],
     status : {type : Boolean, required : true, default : true}
 });
 

@@ -6,6 +6,6 @@ var status = new Schema({
     applyDate : {type : Date},
     user : {type : Object},
     description : {type : Object}
-}, { toJSON: { virtuals: true } });
+}, {_id : false}, {id : false}, { toJSON: { virtuals: true } });
   
 module.exports = status;
