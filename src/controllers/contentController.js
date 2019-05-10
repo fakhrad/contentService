@@ -176,6 +176,18 @@ var deleteContent = function(req, cb)
 
 var updateContent = function(req, cb)
 {
+    if (!req.body)
+    {
+        var result = {success : false, data : null, error : null };
+            if (err)
+            {
+                result.success = false;
+                result.data =  undefined;
+                result.error = "Invalid request";
+                cb(result);       
+                return; 
+            }
+    }
      Contents.findById(req.body.id).exec(function(err, content){
         var result = {success : false, data : null, error : null };
         if (err)
