@@ -8,6 +8,6 @@ var sys = new Schema({
     issueDate : {type : Date, required : true, default : new Date()},
     lastUpdater : {type : Object},
     lastUpdateTime : {type : Date}
-}, { toJSON: { virtuals: true } });
+}, {_id : false}, {id : false}, { toJSON: { virtuals: true } });
   
 module.exports = sys;

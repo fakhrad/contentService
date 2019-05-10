@@ -8,6 +8,6 @@ var field = new Schema({
     type : {type : Object, required : true},
     isBase : {type : Boolean, default : false},
     localize : {type : Boolean, default : false}
-}, { toJSON: { virtuals: true } });
+}, {_id : false}, {id : false}, { toJSON: { virtuals: true } });
   
 module.exports = field;
