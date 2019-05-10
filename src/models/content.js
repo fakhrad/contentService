@@ -34,7 +34,7 @@ content.methods.unPublish = function(cb) {
   if (this.status === "published" && this.statusLog.length > 0)
   {
       this.statusLog.pop();
-      this.status = this.statusLog[statusLog.length - 1].code;
+      this.status = this.statusLog[this.statusLog.length - 1].code;
       this.save(cb);
   }
   else
@@ -61,7 +61,7 @@ content.methods.unArchive = function(cb) {
   if (this.status === "archived" && this.statusLog.length > 0)
   {
       this.statusLog.pop();
-      this.status = this.statusLog[statusLog.length - 1].code;
+      this.status = this.statusLog[this.statusLog.length - 1].code;
       this.save(cb);
   }
   else
