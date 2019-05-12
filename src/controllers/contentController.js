@@ -5,9 +5,9 @@ var filter = function(req, cb)
     var flt = {
         'sys.spaceId' : req.spaceId,
         name : req.body.name ,
-        category : { $in : req.body.category} ,
-        contentType : { $in : req.body.contentType},
-        status : { $in : req.body.status} 
+        category : { $in : req.body.category.split(',')} ,
+        contentType : { $in : req.body.contentType.split(',')},
+        status : { $in : req.body.status.split(',')} 
     };
     if (!req.body.name)
         delete flt.name;

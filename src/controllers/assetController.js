@@ -45,10 +45,15 @@ var findAll = function(req, cb)
 
 var filter = function(req, cb)
 {
+    var st = "", ft = "";
+    if (req.body.fileType)
+        ft = req.body.fileType.split(',');
+    if (req.body.status)
+        st = req.body.status.split(',');
     var flt = {
         'sys.spaceId' : req.spaceId,
-        fileType : { $in : req.body.fileType},
-        status : {$in : req.body.status}
+        fileType : { $in : ft},
+        status : {$in : st}
     };
     if (!req.body.fileType)
         delete flt.fileType;
