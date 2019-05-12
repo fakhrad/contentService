@@ -2,12 +2,19 @@ const Contents = require('../models/content');
 
 var filter = function(req, cb)
 {
+    var c= undefined, ct, st;
+    if (req.body.category)
+        c = req.body.category.split(',');
+    if (req.body.contentType)
+        ct = req.body.contentType.split(',');
+    if (req.body.status)
+        st = req.body.status.split(',');
     var flt = {
         'sys.spaceId' : req.spaceId,
         name : req.body.name ,
-        category : { $in : req.body.category.split(',')} ,
-        contentType : { $in : req.body.contentType.split(',')},
-        status : { $in : req.body.status.split(',')} 
+        category : { $in : c} ,
+        contentType : { $in : ct},
+        status : { $in : st} 
     };
     if (!req.body.name)
         delete flt.name;
