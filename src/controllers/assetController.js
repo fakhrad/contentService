@@ -47,8 +47,8 @@ var filter = function(req, cb)
 {
     var flt = {
         'sys.spaceId' : req.spaceId,
-        fileType : req.body.fileType ? req.body.fileType : undefined,
-        status : req.body.status ? {$in : req.body.status} : undefined
+        fileType : { $in : req.body.fileType},
+        status : {$in : req.body.status}
     };
     if (!req.body.fileType)
         delete flt.fileType;
