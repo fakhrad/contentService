@@ -3,16 +3,20 @@ const Contents = require('../models/content');
 var filter = function(req, cb)
 {
     var flt = {
-        'sys.spaceId' : req.spaceId
+        'sys.spaceId' : req.spaceId,
+        name : req.body.name ,
+        category : { $in : req.body.category} ,
+        contentType : { $in : req.body.contentType},
+        status : { $in : ["changed"]} 
     };
-    if (req.body.name)
-        flt.name = req.body.name;
-    if (req.body.category)
-        flt.category = req.body.category;
-    if (req.body.contentType)
-        flt.contentType = req.body.contentType;
-    if (req.body.status)
-        flt.status = req.body.status;
+    if (!req.body.name)
+        delete flt.name;
+    if (!req.body.category)
+        delete flt.category;
+    if (!req.body.contentType)
+        delete flt.contentType;
+    if (!req.body.status)
+        delete flt.status;
     console.log(flt);
     Contents.find(flt).populate('contentType', "title").populate('category', 'name').exec(function(err, contents){
         var result = {success : false, data : null, error : null };

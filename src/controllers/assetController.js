@@ -46,14 +46,14 @@ var findAll = function(req, cb)
 var filter = function(req, cb)
 {
     var flt = {
-        'sys.spaceId' : req.spaceId
+        'sys.spaceId' : req.spaceId,
+        fileType : req.body.fileType ? req.body.fileType : undefined,
+        status : req.body.status ? {$in : req.body.status} : undefined
     };
-    if (req.body.fileType)
-        flt.fileType = req.body.fileType;
-    if (req.body.status)
-        flt.status = req.body.status;
-    // flt.sys = {};
-    // flt.sys.spaceId = req.spaceId;
+    if (!req.body.fileType)
+        delete flt.fileType;
+    if (!req.body.status)
+        delete flt.status;
     console.log(flt);
     Assets.find(flt).exec(function(err, Assets){
         var result = {success : false, data : null, error : null };
