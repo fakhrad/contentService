@@ -7,7 +7,7 @@ var filter = function(req, cb)
         name : req.body.name ,
         category : { $in : req.body.category} ,
         contentType : { $in : req.body.contentType},
-        status : { $in : ["changed"]} 
+        status : { $in : req.body.status} 
     };
     if (!req.body.name)
         delete flt.name;
