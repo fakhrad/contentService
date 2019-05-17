@@ -280,7 +280,7 @@ var updateContent = function(req, cb)
                 }
                 //Successfull. 
                 //Publish user profile updated event
-                Contents.findById(req.body.id).populate('contentType').populate('category').exec(function(err, content){
+                Contents.findById(req.body.id).exec(function(err, content){
                     if(err)
                     {
                         result.success = false;
