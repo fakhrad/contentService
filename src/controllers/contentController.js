@@ -267,7 +267,7 @@ var updateContent = function(req, cb)
             }
             content.sys.lastUpdater = req.userId;
              if (req.body.contentType)
-                content.sys.contentType = req.body.contentType;
+                content.contentType = req.body.contentType;
             content.sys.lastUpdateTime = new Date();
             content.save(function(err){
                 if(err)
