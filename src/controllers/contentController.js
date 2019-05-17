@@ -266,6 +266,8 @@ var updateContent = function(req, cb)
                 content.statusLog.push(newStatus);
             }
             content.sys.lastUpdater = req.userId;
+            if (content.sys.contentType === undefined || content.sys.contentType === null)
+                content.sys.contentType = req.body.contentType;
             content.sys.lastUpdateTime = new Date();
             content.save(function(err){
                 if(err)
