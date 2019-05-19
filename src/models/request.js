@@ -12,6 +12,7 @@ var request = new Schema({
     thumbnail : {type : String},
     link : {type : String},
     attachments : [String],
+    receiver : {type : String},
     status : {type : String, enum : ['draft', 'published', 'changed', 'archived'], default : 'draft'},
     statusLog : [Status]
 });

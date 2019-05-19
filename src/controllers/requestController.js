@@ -149,6 +149,7 @@ var addContent = function(req, cb)
         description : req.body.description,
         thumbnail : req.body.thumbnail,
         attachments : req.body.attachments,
+        receiver : req.body.receiver,
         status : "draft",
         statusLog : []
     });
@@ -262,6 +263,7 @@ var updateContent = function(req, cb)
             request.thubmnail = req.body.thumbnail;
             request.description = req.body.description;
             request.title = req.body.title;
+            request.receiver = req.body.receiver;
             if (request.status != "draft")
             {
                 var newStatus = {}
