@@ -343,7 +343,7 @@ function whenConnected() {
             });
           });
       });
-      ch.assertQueue("getallrequests", {durable: false}, (err, q)=>{
+      ch.assertQueue("getrequests", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             requestController.getAll(req, (result)=>{
