@@ -167,7 +167,6 @@ var addContent = function(req, cb)
     request.sys.issuer = req.userId;
     request.sys.issueDate = new Date();
     request.sys.spaceId = req.spaceId;
-    request.link = uniqid();
     request.save(function(err){
         var result = {success : false, data : null, error : null };
         if (err)

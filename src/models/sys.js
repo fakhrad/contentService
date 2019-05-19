@@ -1,7 +1,9 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+var uniqid = require('uniqid');
 
 var sys = new Schema({
+    link : {type : String, default : uniqid()},
     type : {type : String},
     spaceId : {type : String, required : true},
     issuer : {type : Object},
