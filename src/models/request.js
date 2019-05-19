@@ -9,9 +9,9 @@ var request = new Schema({
     description : {type : Object},
     contentType : {type: Schema.Types.ObjectId, ref: 'ContentType' , required : true},
     category : {type: Schema.Types.ObjectId, ref: 'Category'},
-    thumbnail : [],
+    thumbnail : [Object],
     link : {type : String},
-    attachments : [String],
+    attachments : [Object],
     receiver : {type : String},
     status : {type : String, enum : ['draft', 'published', 'changed', 'archived'], default : 'draft'},
     statusLog : [Status]
