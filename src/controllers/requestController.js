@@ -2,22 +2,24 @@ const Requests = require('../models/request');
 var uniqid = require('uniqid');
 var filter = function(req, cb)
 {
-    var c= undefined, ct, st;
+    var c= undefined, ct, st, title;
     if (req.body.category)
         c = req.body.category.split(',');
     if (req.body.contentType)
         ct = req.body.contentType.split(',');
     if (req.body.status)
         st = req.body.status.split(',');
+    if (req.body.title)
+        title = req.body.title;
     var flt = {
         'sys.spaceId' : req.spaceId,
-        name : req.body.name ,
+        title : title ,
         category : { $in : c} ,
         contentType : { $in : ct},
         status : { $in : st} 
     };
-    if (!req.body.name)
-        delete flt.name;
+    if (!req.body.title)
+        delete flt.title;
     if (!req.body.category)
         delete flt.category;
     if (!req.body.contentType)
