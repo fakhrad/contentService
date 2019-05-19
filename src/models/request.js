@@ -9,7 +9,7 @@ var request = new Schema({
     description : {type : Object},
     contentType : {type: Schema.Types.ObjectId, ref: 'ContentType' , required : true},
     category : {type: Schema.Types.ObjectId, ref: 'Category'},
-    thumbnail : {type : String},
+    thumbnail : [],
     link : {type : String},
     attachments : [String],
     receiver : {type : String},
