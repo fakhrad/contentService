@@ -145,6 +145,10 @@ var addContent = function(req, cb)
         sys : {},
         contentType : req.body.contentType,
         category : req.body.category,
+        title : req.body.title,
+        description : req.body.description,
+        thumbnail : req.body.thumbnail,
+        attachments : req.body.attachments,
         status : "draft",
         statusLog : []
     });
@@ -254,6 +258,10 @@ var updateContent = function(req, cb)
         {
             request.category = req.body.catgory;
             request.contentType = req.body.contentType;
+            request.attachments = req.body.attachments;
+            request.thubmnail = req.body.thumbnail;
+            request.description = req.body.description;
+            request.title = req.body.title;
             if (request.status != "draft")
             {
                 var newStatus = {}
