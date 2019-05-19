@@ -6,6 +6,7 @@ var Schema = mongoose.Schema;
 
 var content = new Schema({
     sys : {type:sysfld, required :true},
+    requestId : {type: Schema.Types.ObjectId, ref: 'Request' },
     fields : {type : Object},
     status : {type : String, enum : ['draft', 'published', 'changed', 'archived'], default : 'draft'},
     statusLog : [status],

@@ -146,6 +146,7 @@ var addContent = function(req, cb)
         fields: req.body.fields,
         contentType : req.body.contentType,
         category : req.body.category,
+        requestId : req.body.requestId,
         status : "draft",
         statusLog : []
     });
@@ -269,6 +270,7 @@ var updateContent = function(req, cb)
              if (req.body.contentType)
                 content.contentType = req.body.contentType;
             content.sys.lastUpdateTime = new Date();
+            content.requestId = req.body.requestId;
             content.save(function(err){
                 if(err)
                 {
