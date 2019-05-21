@@ -6,7 +6,7 @@ var sys = new Schema({
     link : {type : String, default : uniqid()},
     type : {type : String},
     spaceId : {type : String, required : true},
-    issuer : {type: Object},
+    issuer : {type: Schema.Types.ObjectId, ref: 'AdminUsers'},
     issueDate : {type : Date, required : true, default : new Date()},
     lastUpdater : {type : Object},
     lastUpdateTime : {type : Date}
