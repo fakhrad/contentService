@@ -13,7 +13,8 @@ var request = new Schema({
     attachments : [Object],
     receiver : {type : String},
     status : {type : String, enum : ['draft', 'published', 'changed', 'archived'], default : 'draft'},
-    statusLog : [Status]
+    statusLog : [Status],
+    settings : {type : Object}
 });
 
 request.methods.publish = function(user, description, cb) {

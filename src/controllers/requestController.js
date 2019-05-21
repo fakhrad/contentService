@@ -183,7 +183,8 @@ var addContent = function(req, cb)
         attachments : req.body.attachments,
         receiver : req.body.receiver,
         status : "draft",
-        statusLog : []
+        statusLog : [],
+        settings : req.body.settings
     });
 
     var newStatus = {}
@@ -295,6 +296,7 @@ var updateContent = function(req, cb)
             request.description = req.body.description;
             request.title = req.body.title;
             request.receiver = req.body.receiver;
+            request.settings = req.body.settings;
             if (request.status != "draft")
             {
                 var newStatus = {}
