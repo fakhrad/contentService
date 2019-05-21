@@ -143,6 +143,7 @@ var findById = function(req, cb)
 
 var findByLink = function(req, cb)
 {
+    console.log(req);
     Requests.find({"sys.link" : req.body.link}).populate('contentType').populate('category').populate("sys.issuer").exec(function(err, request){
         var result = {success : false, data : null, error : null };
         if (err)
