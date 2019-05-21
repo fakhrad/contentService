@@ -58,6 +58,7 @@ content.methods.archive = function(user, description, cb) {
       cb("Item already archived!");
 };
 
+
 content.methods.unArchive = function(cb) {
   if (this.status === "archived" && this.statusLog.length > 0)
   {
