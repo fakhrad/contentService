@@ -255,7 +255,7 @@ var updateContent = function(req, cb)
         if (content)
         {
             content.fields = req.body.fields;
-            content.category = req.body.catgory;
+            content.category = req.body.category;
             if (content.status != "draft")
             {
                 var newStatus = {}

@@ -141,6 +141,35 @@ var findById = function(req, cb)
     });
 };
 
+var findByLink = function(req, cb)
+{
+    Requests.find({"sys.link" : req.body.link}).populate('contentType').populate('category').populate("sys.issuer").exec(function(err, request){
+        var result = {success : false, data : null, error : null };
+        if (err)
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = err;
+            cb(result);       
+            return; 
+        }
+        if (request)
+        {
+            result.success = true;
+            result.error = undefined;
+
+            result.data =  request;
+            cb(result); 
+        }
+        else
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = undefined;
+            cb(result); 
+        }
+    });
+};
 var addContent = function(req, cb)
 {
     var request = new Requests({
@@ -500,6 +529,7 @@ var unArchiveContent = function(req, cb)
 exports.getAll = findAll;
 exports.filter = filter;
 exports.findById = findById;
+exports.findByLink = findByLink;
 exports.add = addContent;
 exports.delete = deleteContent;
 exports.update = updateContent;

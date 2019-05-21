@@ -316,6 +316,15 @@ function whenConnected() {
             });
           });
       });
+      ch.assertQueue("getrequestbylink", {durable: false}, (err, q)=>{
+        ch.consume(q.queue, function reply(msg) {
+            var req = JSON.parse(msg.content.toString('utf8'));
+            requestController.findByLink(req, (result)=>{
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                ch.ack(msg);
+            });
+          });
+      });
       ch.assertQueue("addrequest", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
