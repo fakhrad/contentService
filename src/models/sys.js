@@ -15,8 +15,12 @@ var sys = new Schema({
 
 sys.pre('save', function(next) {
     // do stuff
-    if (this.isModified()) return next();
-    this.link = uniqid();
-    next();
+    if (this.link) 
+     next();
+    else
+    {
+      this.link = uniqid();
+      next();
+    }
   });
 module.exports = sys;
