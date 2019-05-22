@@ -13,14 +13,4 @@ var sys = new Schema({
     lastUpdateTime : {type : Date}
 }, {_id : false}, {id : false}, { toJSON: { virtuals: true } });
 
-sys.pre('save', function(next) {
-    // do stuff
-    if (this.link) 
-     next();
-    else
-    {
-      this.link = uniqid();
-      next();
-    }
-  });
 module.exports = sys;

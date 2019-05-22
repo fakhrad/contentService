@@ -1,4 +1,5 @@
 const Contents = require('../models/content');
+var uniqid = require('uniqid');
 
 var filter = function(req, cb)
 {
@@ -160,6 +161,7 @@ var addContent = function(req, cb)
     content.statusLog.push(newStatus);
 
     content.sys.type = "content";
+    content.sys.link = uniqid();
     content.sys.spaceId = req.spaceid;
     content.sys.issuer = req.userId;
     content.sys.issueDate = new Date();

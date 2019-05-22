@@ -196,6 +196,7 @@ var addContent = function(req, cb)
     request.statusLog.push(newStatus);
 
     request.sys.type = "request";
+    request.sys.link = uniqid();
     request.sys.spaceId = req.spaceid;
     request.sys.issuer = req.userId;
     request.sys.issueDate = new Date();

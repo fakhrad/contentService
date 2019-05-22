@@ -1,5 +1,6 @@
 const Assets = require('../models/asset');
 const Status = require('../models/status');
+var uniqid = require('uniqid');
 
 var findAll = function(req, cb)
 {
@@ -137,6 +138,7 @@ var addAsset = function(req, cb)
     asset.statusLog.push(newStatus);
 
     asset.sys.type = "asset";
+    asset.sys.link = uniqid();
     asset.sys.spaceId = req.spaceid;
     asset.sys.issuer = req.userId;
     asset.sys.issueDate = new Date();

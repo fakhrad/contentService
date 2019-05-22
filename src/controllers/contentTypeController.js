@@ -1,4 +1,5 @@
 var ContentTypes = require('../models/contentType'); 
+var uniqid = require('uniqid');
 
 var getContentTypes = function(req, cb)
 {
@@ -74,6 +75,7 @@ var addContentTypes = function(req, cb)
         fields : req.body.fields
     });
     cat.sys.type = "contentType";
+    cat.sys.link = uniqid();
     cat.sys.spaceId = req.spaceid;
     cat.sys.issuer = req.userId;
     cat.sys.issueDate = new Date();

@@ -1,6 +1,7 @@
 var Category = require('../models/category'); 
 var sys = require('../models/sys'); 
 var async = require('async')
+var uniqid = require('uniqid');
 
 function buildTree(parent, list)
 {
@@ -154,6 +155,7 @@ var addCategory = function(req, cb)
         image : req.body.image
     });
     cat.sys.type = "category";
+    cat.sys.link = uniqid();
     cat.sys.issuer = req.userId;
     cat.sys.issueDate = new Date();
     cat.sys.spaceId = req.spaceId;
