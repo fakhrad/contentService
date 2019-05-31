@@ -994,6 +994,11 @@ function whenConnected() {
           });
       });
       //Exchanges
+      var exchange = 'contetnservice';
+
+      channel.assertExchange(exchange, 'direct', {
+        durable: false
+      });
 
       ch.assertQueue("adminuserregistered", {durable: false}, (err, q)=>{
         if (!err)
