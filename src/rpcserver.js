@@ -994,7 +994,7 @@ function whenConnected() {
           });
       });
       //Exchanges
-      var exchange = 'contetnservice';
+      var exchange = 'contentservice';
 
       channel.assertExchange(exchange, 'direct', {
         durable: false
