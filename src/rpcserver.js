@@ -1030,6 +1030,7 @@ start();
 db();
 exports.publish = function(exchange, queue, message)
 {
-    console.log('publishing message to : ' + queue);
-    channel.publish(exchange, queue, Buffer.from(JSON.stringify(message)));
+  console.log(message);
+  channel.publish(exchange, queue, Buffer.from(JSON.stringify({body : message})));
+  console.log('publishing message to : ' + exchange + " : " + queue);
 }
