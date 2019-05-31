@@ -1,5 +1,6 @@
 const Space = require('../models/space');
-var uuid = require('uuid/v4')
+var uuid = require('uuid/v4');
+var spaceCreated = require('../events/OnSpaceCreated');
 
 var findByUserId = function(req, cb)
 {
@@ -80,6 +81,7 @@ var addSpace = function(req, cb)
         }
         //Successfull. 
         //Publish user registered event
+        spaceCreated.OnSpaceCreated().call(space);
         result.success = true;
         result.error = undefined;
         result.data =  space;

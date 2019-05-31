@@ -7,10 +7,10 @@ function OnSpaceCreated(){
         }
     }
     
-    function _call(user) {
+    function _call(space) {
         console.log('event triggered.')
-        broker.publish("contentservice", "OnSpaceCreated", user);
-        _onOk(user);
+        broker.publish("contentservice", "OnSpaceCreated", space);
+        _onOk(space);
     }
     return {
             call: _call,
