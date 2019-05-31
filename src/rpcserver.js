@@ -1000,6 +1000,7 @@ function whenConnected() {
         {
           ch.bindQueue(q.queue, "adminauth", "adminuserregistered")
           ch.consume(q.queue, function(msg) {
+            // console.log(msg);
             var req = JSON.parse(msg.content.toString('utf8'));
             console.log("Admin user registered. creating space");
             spaceController.createuserspace(req, (result)=> {});
