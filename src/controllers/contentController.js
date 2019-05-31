@@ -140,6 +140,36 @@ var findById = function(req, cb)
     });
 };
 
+var findByLink = function(req, cb)
+{
+    console.log(req);
+    Contents.findOne({"sys.link" : req.body.link}).populate('contentType').populate('category').populate("sys.issuer").exec(function(err, content){
+        var result = {success : false, data : null, error : null };
+        if (err)
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = err;
+            cb(result);       
+            return; 
+        }
+        if (request)
+        {
+            result.success = true;
+            result.error = undefined;
+
+            result.data =  content;
+            cb(result); 
+        }
+        else
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = undefined;
+            cb(result); 
+        }
+    });
+};
 var addContent = function(req, cb)
 {
     var content = new Contents({
@@ -185,6 +215,14 @@ var addContent = function(req, cb)
         cb(result); 
     });
 };
+
+var submit = function(req, cb)
+{
+    if (request.body.content)
+        this.update(req, cb);
+    else
+        this.addContent(req, cb);
+}
 
 var deleteContent = function(req, cb)
 {
@@ -494,9 +532,11 @@ var unArchiveContent = function(req, cb)
 exports.getAll = findAll;
 exports.filter = filter;
 exports.findById = findById;
+exports.findByLink = findByLink;
 exports.add = addContent;
 exports.delete = deleteContent;
 exports.update = updateContent;
+exports.submit = submit;
 exports.load = loadContents;
 exports.publish = publishContent;
 exports.unPublish = unPublishContent;
