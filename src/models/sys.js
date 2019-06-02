@@ -1,7 +1,5 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var uniqid = require('uniqid');
-var admin = require('./adminusers');
 
 var sys = new Schema({
     link : {type : String},

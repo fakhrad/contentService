@@ -1,4 +1,5 @@
 var ContentTypes = require('../models/contentType'); 
+var Space = require('../models/space'); 
 var uniqid = require('uniqid');
 
 var getContentTypes = function(req, cb)

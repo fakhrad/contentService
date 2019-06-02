@@ -6,6 +6,8 @@ const ctypeController = require('./controllers/contentTypeController');
 const assetController = require('./controllers/assetController');
 const categoriesController = require('./controllers/categoryController');
 var spaceController = require('./controllers/spaceController');
+var adminController = require('./controllers/adminController');
+var async = require('async');
 
 var rabbitHost = process.env.RABBITMQ_HOST || "amqp://gvgeetrh:6SyWQAxDCpcdg1S0Dc-Up0sUxfmBUVZU@chimpanzee.rmq.cloudamqp.com/gvgeetrh";
 //var rabbitHost = process.env.RABBITMQ_HOST || "amqp://localhost:5672";
@@ -1008,13 +1010,18 @@ function whenConnected() {
             // console.log(msg);
             var req = JSON.parse(msg.content.toString('utf8'));
             console.log("Admin user registered. creating space");
-            spaceController.createuserspace(req, (result)=> {});
             try
             {
+              async.parallel({
+                "space" : function(callback) {spaceController.createuserspace(req, callback)},
+                "adminuser" : function(callback) {adminController.registeruser(req, callback)},
+              }, (err, results)=>{
+
+              });
             }
             catch(ex)
             {
-
+              console.log(ex);
             }
           }, {
             noAck: true
