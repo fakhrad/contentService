@@ -161,6 +161,7 @@ var findByUserName = function(req, cb)
 var registerUser = function(req, cb)
 {
     console.log('Importing admin user');
+    console.log(req.body);
     User.insertMany([req.body], (err, docs)=>{
         var result = {success : false, data : null, error : null };
         if (err)
