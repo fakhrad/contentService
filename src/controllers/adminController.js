@@ -105,6 +105,7 @@ var savetoken = function(req, cb)
         if (user)
         {
             user.access_token = req.body.access_token;
+            Object.assign(user, req.body);
             user.save(function(err){
                 if(err)
                 {
