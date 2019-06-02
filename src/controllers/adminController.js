@@ -88,6 +88,46 @@ var logout = function(req, cb)
         }
     });
 };
+
+var savetoken = function(req, cb)
+{
+    console.log(req);
+     User.findById(req.body.id).exec(function(err, user){
+        var result = {success : false, data : null, error : null };
+        if (err)
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = err;
+            cb(result);       
+            return; 
+        }
+        if (user)
+        {
+            user.access_token = req.body.access_token;
+            user.save(function(err){
+                if(err)
+                {
+                    result.success = false;
+                    result.data =  undefined;
+                    result.error = err;
+                    cb(result);       
+                    return; 
+                }
+                //Successfull. 
+            });
+            return;
+        }
+        else
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = undefined;
+            cb(result);       
+            return; 
+        }
+    });
+};
 var findByUserName = function(req, cb)
 {
     console.log(req.body.username);
@@ -142,3 +182,4 @@ exports.findbyId = findById;
 exports.findbyemail = findByUserName;
 exports.registeruser = registerUser;
 exports.logout = logout;
+exports.savetoken = savetoken;
