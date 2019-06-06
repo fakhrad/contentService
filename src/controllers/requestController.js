@@ -290,7 +290,7 @@ var updateContent = function(req, cb)
         }
         if (request)
         {
-            request.category = req.body.catgory;
+            request.category = req.body.category;
             request.contentType = req.body.contentType;
             request.attachments = req.body.attachments;
             request.thubmnail = req.body.thumbnail;
@@ -312,6 +312,7 @@ var updateContent = function(req, cb)
              if (req.body.contentType)
                 request.contentType = req.body.contentType;
             request.sys.lastUpdateTime = new Date();
+            console.log(req.body);
             request.save(function(err){
                 if(err)
                 {
