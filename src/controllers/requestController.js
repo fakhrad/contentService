@@ -313,6 +313,7 @@ var updateContent = function(req, cb)
                 request.contentType = req.body.contentType;
             request.sys.lastUpdateTime = new Date();
             console.log('---------------------------')
+            console.log(req.body);
             console.log(request);
             request.save(function(err){
                 if(err)
