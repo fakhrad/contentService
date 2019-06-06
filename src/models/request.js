@@ -7,6 +7,7 @@ var request = new Schema({
     sys : {type : sysfld, required : true},
     title : {type : Object, required : true},
     description : {type : Object},
+    longDesc : {type : Object},
     contentType : {type: Schema.Types.ObjectId, ref: 'ContentType' , required : true},
     category : {type: Schema.Types.ObjectId, ref: 'Category'},
     thumbnail : [Object],
@@ -15,7 +16,7 @@ var request = new Schema({
     status : {type : String, enum : ['draft', 'published', 'changed', 'archived'], default : 'draft'},
     statusLog : [Status],
     settings : {type : Object}
-}, { strict: false });
+},);
 
 request.methods.publish = function(user, description, cb) {
     if (this.status != "published")
