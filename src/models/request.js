@@ -16,7 +16,7 @@ var request = new Schema({
     status : {type : String, enum : ['draft', 'published', 'changed', 'archived'], default : 'draft'},
     statusLog : [Status],
     settings : {type : Object}
-});
+}, { strict: false });
 
 request.methods.publish = function(user, description, cb) {
     if (this.status != "published")
