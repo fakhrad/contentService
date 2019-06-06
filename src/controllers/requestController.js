@@ -179,7 +179,7 @@ var addContent = function(req, cb)
         category : req.body.category,
         title : req.body.title,
         description : req.body.description,
-        longDesc = {},
+        longDesc : {},
         longDesc : req.body.longDesc,
         thumbnail : req.body.thumbnail,
         attachments : req.body.attachments,
