@@ -179,6 +179,7 @@ var addContent = function(req, cb)
         category : req.body.category,
         title : req.body.title,
         description : req.body.description,
+        longDesc : req.body.longDesc,
         thumbnail : req.body.thumbnail,
         attachments : req.body.attachments,
         receiver : req.body.receiver,
@@ -296,6 +297,7 @@ var updateContent = function(req, cb)
             request.thumbnail = [];
             request.thumbnail = req.body.thumbnail;
             request.description = req.body.description;
+            request.longDesc = req.body.longDesc;
             request.title = req.body.title;
             request.receiver = req.body.receiver;
             request.settings = req.body.settings;
