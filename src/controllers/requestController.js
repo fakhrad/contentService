@@ -173,6 +173,7 @@ var findByLink = function(req, cb)
 };
 var addContent = function(req, cb)
 {
+    console.log(req.body);
     var request = new Requests({
         sys : {},
         contentType : req.body.contentType,
