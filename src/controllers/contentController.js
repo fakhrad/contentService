@@ -195,7 +195,6 @@ var addContent = function(req, cb)
     content.sys.spaceId = req.spaceid;
     content.sys.issuer = req.userId;
     content.sys.issueDate = new Date();
-    content.sys.spaceId = req.spaceId;
 
     content.save(function(err){
         var result = {success : false, data : null, error : null };

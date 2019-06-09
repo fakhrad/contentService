@@ -118,6 +118,7 @@ var addContentTypes = function(req, cb)
 
 var updateContentType = function(req, cb)
 {
+    console.log(req.body);
      ContentTypes.findById(req.body.id).exec(function(err, contentType){
         var result = {success : false, data : null, error : null };
         if (err)
