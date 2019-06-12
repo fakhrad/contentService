@@ -998,7 +998,7 @@ function whenConnected() {
       //Exchanges
       var exchange = 'contentservice';
 
-      channel.assertExchange(exchange, 'direct', {
+      channel.assertExchange(exchange, 'fanout', {
         durable: false
       });
 
