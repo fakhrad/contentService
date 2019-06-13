@@ -1006,7 +1006,7 @@ function whenConnected() {
         durable: false
       });
 
-      ch.assertQueue("adminuserregistered", {durable: false}, (err, q)=>{
+      ch.assertQueue("authadminuserregistered", {durable: false}, (err, q)=>{
         if (!err)
         {
           ch.bindQueue(q.queue, "adminauth", "adminuserregistered")
@@ -1033,7 +1033,7 @@ function whenConnected() {
         }
       });
 
-      ch.assertQueue("adminuserloggedout", {durable: false}, (err, q)=>{
+      ch.assertQueue("authadminuserloggedout", {durable: false}, (err, q)=>{
         if (!err)
         {
           ch.bindQueue(q.queue, "adminauth", "adminuserloggedout")
@@ -1054,7 +1054,7 @@ function whenConnected() {
           });
         }
       });
-      ch.assertQueue("admintokencreated", {durable: false}, (err, q)=>{
+      ch.assertQueue("authadmintokencreated", {durable: false}, (err, q)=>{
         if (!err)
         {
           ch.bindQueue(q.queue, "adminauth", "admintokencreated")
