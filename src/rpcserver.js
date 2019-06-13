@@ -998,83 +998,83 @@ function whenConnected() {
       //Exchanges
       var exchange = 'contentservice';
 
-      channel.assertExchange(exchange, 'fanout', {
+      channel.assertExchange(exchange, 'direct', {
         durable: false
       });
 
-      channel.assertExchange("adminauth", 'fanout', {
+      channel.assertExchange("adminauth", 'direct', {
         durable: false
       });
 
-      // ch.assertQueue("authadminuserregistered", {durable: false}, (err, q)=>{
-      //   if (!err)
-      //   {
-      //     ch.bindQueue(q.queue, "adminauth", "adminuserregistered")
-      //     ch.consume(q.queue, function(msg) {
-      //       // console.log(msg);
-      //       var req = JSON.parse(msg.content.toString('utf8'));
-      //       console.log("Admin user registered. creating space");
-      //       try
-      //       {
-      //         async.parallel({
-      //           "space" : function(callback) {spaceController.createuserspace(req, callback)},
-      //           "adminuser" : function(callback) {adminController.registeruser(req, callback)},
-      //         }, (err, results)=>{
+      ch.assertQueue("", {durable: false, exclusive : true}, (err, q)=>{
+        if (!err)
+        {
+          ch.bindQueue(q.queue, "adminauth", "adminuserregistered")
+          ch.consume(q.queue, function(msg) {
+            // console.log(msg);
+            var req = JSON.parse(msg.content.toString('utf8'));
+            console.log("Admin user registered. creating space");
+            try
+            {
+              async.parallel({
+                "space" : function(callback) {spaceController.createuserspace(req, callback)},
+                "adminuser" : function(callback) {adminController.registeruser(req, callback)},
+              }, (err, results)=>{
 
-      //         });
-      //       }
-      //       catch(ex)
-      //       {
-      //         console.log(ex);
-      //       }
-      //     }, {
-      //       noAck: true
-      //     });
-      //   }
-      // });
+              });
+            }
+            catch(ex)
+            {
+              console.log(ex);
+            }
+          }, {
+            noAck: true
+          });
+        }
+      });
 
-      // ch.assertQueue("authadminuserloggedout", {durable: false}, (err, q)=>{
-      //   if (!err)
-      //   {
-      //     ch.bindQueue(q.queue, "adminauth", "adminuserloggedout")
-      //     ch.consume(q.queue, function(msg) {
-      //       // console.log(msg);
-      //       var req = JSON.parse(msg.content.toString('utf8'));
-      //       console.log("Admin user logged out. deleting tokens");
-      //       try
-      //       {
-      //          adminController.logout(req, ()=>{});
-      //       }
-      //       catch(ex)
-      //       {
-      //         console.log(ex);
-      //       }
-      //     }, {
-      //       noAck: true
-      //     });
-      //   }
-      // });
-      // ch.assertQueue("authadmintokencreated", {durable: false}, (err, q)=>{
-      //   if (!err)
-      //   {
-      //     ch.bindQueue(q.queue, "adminauth", "admintokencreated")
-      //     ch.consume(q.queue, function(msg) {
-      //       // console.log(msg);
-      //       var req = JSON.parse(msg.content.toString('utf8'));
-      //       console.log("Admin user token created. adding tokens");
-      //       try
-      //       {
-      //          adminController.savetoken(req, ()=>{});
-      //       }
-      //       catch(ex)
-      //       {
-      //         console.log(ex);
-      //       }
-      //     }, {
-      //       noAck: true
-      //     });
-      //   }
-      // });
+      ch.assertQueue("", {durable: false, exclusive : true}, (err, q)=>{
+        if (!err)
+        {
+          ch.bindQueue(q.queue, "adminauth", "adminuserloggedout")
+          ch.consume(q.queue, function(msg) {
+            // console.log(msg);
+            var req = JSON.parse(msg.content.toString('utf8'));
+            console.log("Admin user logged out. deleting tokens");
+            try
+            {
+               adminController.logout(req, ()=>{});
+            }
+            catch(ex)
+            {
+              console.log(ex);
+            }
+          }, {
+            noAck: true
+          });
+        }
+      });
+      ch.assertQueue("", {durable: false, exclusive : true}, (err, q)=>{
+        if (!err)
+        {
+          ch.bindQueue(q.queue, "adminauth", "admintokencreated")
+          ch.consume(q.queue, function(msg) {
+            // console.log(msg);
+            var req = JSON.parse(msg.content.toString('utf8'));
+            console.log("Admin user token created. adding tokens");
+            try
+            {
+               adminController.savetoken(req, ()=>{});
+            }
+            catch(ex)
+            {
+              console.log(ex);
+            }
+          }, {
+            noAck: true
+          });
+        }
+      });
     });
 
 
