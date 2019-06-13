@@ -56,7 +56,7 @@ function whenConnected() {
         ch.prefetch(1);
         console.log('Content service broker started!');
       //Login API
-      ch.assertQueue("getcontents", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("getcontents", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
               try{
@@ -74,7 +74,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("addcontenttype", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("addcontenttype", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -92,7 +92,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("updatecontenttype", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("updatecontenttype", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -110,7 +110,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("removecontenttype", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("removecontenttype", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -128,7 +128,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("getcontenttypes", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("getcontenttypes", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -147,7 +147,7 @@ function whenConnected() {
           });
       });
 
-      ch.assertQueue("getcontenttypesbyid", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("getcontenttypesbyid", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -166,7 +166,7 @@ function whenConnected() {
           });
       });
       
-      ch.assertQueue("addasset", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("addasset", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -184,7 +184,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("updateasset", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("updateasset", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -202,7 +202,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("removeasset", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("removeasset", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -220,7 +220,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("getallassets", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("getallassets", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -239,7 +239,7 @@ function whenConnected() {
           });
       });
 
-      ch.assertQueue("filterassets", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("filterassets", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -258,7 +258,7 @@ function whenConnected() {
           });
       });
 
-      ch.assertQueue("getassetbyid", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("getassetbyid", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -276,7 +276,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("publishasset", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("publishasset", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -294,7 +294,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("unpublishasset", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("unpublishasset", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -312,7 +312,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("archiveasset", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("archiveasset", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -330,7 +330,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("unarchiveasset", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("unarchiveasset", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -351,7 +351,7 @@ function whenConnected() {
 
       //Contents Api
 
-      ch.assertQueue("filtercontents", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("filtercontents", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -369,7 +369,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("getcontentbyid", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("getcontentbyid", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -387,7 +387,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("getcontentbylink", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("getcontentbylink", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -405,7 +405,7 @@ function whenConnected() {
  
           });
       });
-      ch.assertQueue("addcontent", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("addcontent", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -423,7 +423,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("updatecontent", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("updatecontent", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -441,7 +441,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("removecontent", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("removecontent", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -459,7 +459,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("getallcontents", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("getallcontents", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -477,7 +477,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("publishcontent", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("publishcontent", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -495,7 +495,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("unpublishcontent", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("unpublishcontent", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -513,7 +513,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("archivecontent", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("archivecontent", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -531,7 +531,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("unarchivecontent", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("unarchivecontent", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -550,7 +550,7 @@ function whenConnected() {
           });
       });
 
-      ch.assertQueue("submitrequest", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("submitrequest", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -570,7 +570,7 @@ function whenConnected() {
       });
       //Requests Api
 
-      ch.assertQueue("filterrequests", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("filterrequests", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -588,7 +588,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("getrequestbyid", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("getrequestbyid", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -606,7 +606,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("getrequestbylink", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("getrequestbylink", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -624,7 +624,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("addrequest", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("addrequest", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -642,7 +642,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("updaterequest", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("updaterequest", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -660,7 +660,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("removerequest", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("removerequest", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -678,7 +678,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("getrequests", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("getrequests", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -696,7 +696,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("publishrequest", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("publishrequest", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -714,7 +714,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("unpublishrequest", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("unpublishrequest", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -732,7 +732,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("archiverequest", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("archiverequest", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -750,7 +750,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("unarchiverequest", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("unarchiverequest", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -769,7 +769,7 @@ function whenConnected() {
           });
       });      
       //Category Api
-      ch.assertQueue("addcategory", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("addcategory", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -787,7 +787,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("updatecategory", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("updatecategory", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -805,7 +805,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("removecategory", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("removecategory", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -823,7 +823,7 @@ function whenConnected() {
 
           });
       });
-      ch.assertQueue("getallcategories", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("getallcategories", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
@@ -844,7 +844,7 @@ function whenConnected() {
 
         ///Spaces management api
         //AddSpace API
-        ch.assertQueue("addspace", {durable: false, exclusive : true}, (err, q)=>{
+        ch.assertQueue("addspace", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
               try{
@@ -863,7 +863,7 @@ function whenConnected() {
           });
       });
       //Remove Space API
-      ch.assertQueue("removespace", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("removespace", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
               try{
@@ -882,7 +882,7 @@ function whenConnected() {
           });
       });
       //Update Space API
-      ch.assertQueue("updatespace", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("updatespace", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
               try{
@@ -900,7 +900,7 @@ function whenConnected() {
           });
       });
       //Get Space By Id API
-      ch.assertQueue("getspacebyid", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("getspacebyid", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
               try{
@@ -919,7 +919,7 @@ function whenConnected() {
           });
       });
       //Get Space By User Id API
-      ch.assertQueue("getspacebyuserid", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("getspacebyuserid", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
               try{
@@ -938,7 +938,7 @@ function whenConnected() {
           });
       });
       //Set Space Locales
-      ch.assertQueue("setspacelocales", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("setspacelocales", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
               try{
@@ -958,7 +958,7 @@ function whenConnected() {
       });
 
       //Set Space Webhooks
-      ch.assertQueue("setspacewebhooks", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("setspacewebhooks", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
               try{
@@ -977,7 +977,7 @@ function whenConnected() {
           });
       });
       //Set Space Webhooks
-      ch.assertQueue("getspacewebhooks", {durable: false, exclusive : true}, (err, q)=>{
+      ch.assertQueue("getspacewebhooks", {durable: false}, (err, q)=>{
           ch.consume(q.queue, function reply(msg) {
               var req = JSON.parse(msg.content.toString('utf8'));
               try{
