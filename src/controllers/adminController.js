@@ -163,20 +163,25 @@ var registerUser = function(req, cb)
 {
     console.log('Importing admin user');
     console.log(req.body);
-    User.insertMany([req.body], (err, docs)=>{
+    User.findByIdAndUpdate(req.body._id, req.body, {upsert:true, useFindAndModify : false, new : true}).exec((err, admin)=>{
         var result = {success : false, data : null, error : null };
         if (err)
         {
             result.success = false;
             result.data =  undefined;
             result.error = err;
+            if (cb)
             cb(result);       
             return; 
         }
         //Successfull. 
         console.log('User imported successfully');
-        cb(docs);
-    });
+        result.success = true;
+        result.data =  admin;
+        result.error = undefined;
+        if (cb)
+        cb(result);
+    });  
 };
 
 //Export functions
