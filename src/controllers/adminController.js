@@ -89,6 +89,30 @@ var logout = function(req, cb)
     });
 };
 
+var registerUser = function(req, cb)
+{
+    console.log('Importing admin user');
+    console.log(req.body);
+    User.findByIdAndUpdate(req.body._id, req.body, {upsert:true, useFindAndModify : false, new : true}).exec((err, admin)=>{
+        var result = {success : false, data : null, error : null };
+        if (err)
+        {
+            result.success = false;
+            result.data =  undefined;
+            result.error = err;
+            if (cb)
+            cb(result);       
+            return; 
+        }
+        //Successfull. 
+        console.log('User imported successfully');
+        result.success = true;
+        result.data =  admin;
+        result.error = undefined;
+        if (cb)
+        cb(result);
+    });  
+};
 var savetoken = function(req, cb)
 {
     console.log(req);
@@ -121,11 +145,7 @@ var savetoken = function(req, cb)
         }
         else
         {
-            result.success = false;
-            result.data =  undefined;
-            result.error = undefined;
-            cb(result);       
-            return; 
+            registerUser(req. cb);
         }
     });
 };
@@ -159,30 +179,7 @@ var findByUserName = function(req, cb)
         }
     });
 };
-var registerUser = function(req, cb)
-{
-    console.log('Importing admin user');
-    console.log(req.body);
-    User.findByIdAndUpdate(req.body._id, req.body, {upsert:true, useFindAndModify : false, new : true}).exec((err, admin)=>{
-        var result = {success : false, data : null, error : null };
-        if (err)
-        {
-            result.success = false;
-            result.data =  undefined;
-            result.error = err;
-            if (cb)
-            cb(result);       
-            return; 
-        }
-        //Successfull. 
-        console.log('User imported successfully');
-        result.success = true;
-        result.data =  admin;
-        result.error = undefined;
-        if (cb)
-        cb(result);
-    });  
-};
+
 
 //Export functions
 exports.findbyId = findById;
