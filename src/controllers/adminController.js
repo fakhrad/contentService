@@ -116,38 +116,25 @@ var registerUser = function(req, cb)
 var savetoken = function(req, cb)
 {
     console.log(req);
-     User.findById(req.body.id).exec(function(err, user){
+    User.findByIdAndUpdate(req.body._id, req.body, {upsert:true, useFindAndModify : false, new : true}).exec((err, admin)=>{
         var result = {success : false, data : null, error : null };
         if (err)
         {
             result.success = false;
             result.data =  undefined;
             result.error = err;
+            if (cb)
             cb(result);       
             return; 
         }
-        if (user)
-        {
-            user.access_token = req.body.access_token;
-            Object.assign(user, req.body);
-            user.save(function(err){
-                if(err)
-                {
-                    result.success = false;
-                    result.data =  undefined;
-                    result.error = err;
-                    cb(result);       
-                    return; 
-                }
-                //Successfull. 
-            });
-            return;
-        }
-        else
-        {
-            registerUser(req. cb);
-        }
-    });
+        //Successfull. 
+        console.log('User imported successfully');
+        result.success = true;
+        result.data =  admin;
+        result.error = undefined;
+        if (cb)
+        cb(result);
+    });  
 };
 var findByUserName = function(req, cb)
 {
