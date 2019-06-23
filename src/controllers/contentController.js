@@ -26,7 +26,7 @@ var filter = function(req, cb)
     if (!req.body.status)
         delete flt.status;
     console.log(flt);
-    Contents.find(flt).populate('contentType', "title").populate('category', 'name').select("fields.name fields.description status sys category contentType").exec(function(err, contents){
+    Contents.find(flt).populate('contentType', "title, media").populate('category', 'name').select("fields.name fields.description status sys category contentType").exec(function(err, contents){
         var result = {success : false, data : null, error : null };
         if (err)
         {
