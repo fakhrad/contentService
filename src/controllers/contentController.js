@@ -172,6 +172,7 @@ var findByLink = function(req, cb)
 };
 var addContent = function(req, cb)
 {
+    console.log(req);
     var content = new Contents({
         sys : {},
         fields: req.body.fields,
