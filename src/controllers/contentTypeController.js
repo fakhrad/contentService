@@ -77,7 +77,6 @@ var addContentTypes = function(req, cb)
     });
     cat.sys.type = "contentType";
     cat.sys.link = uniqid();
-    cat.sys.spaceId = req.spaceid;
     cat.sys.issuer = req.userId;
     cat.sys.issueDate = new Date();
     cat.sys.spaceId = req.spaceId;

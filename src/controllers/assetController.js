@@ -139,7 +139,6 @@ var addAsset = function(req, cb)
 
     asset.sys.type = "asset";
     asset.sys.link = uniqid();
-    asset.sys.spaceId = req.spaceid;
     asset.sys.issuer = req.userId;
     asset.sys.issueDate = new Date();
     asset.sys.spaceId = req.spaceId;

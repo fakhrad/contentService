@@ -200,7 +200,6 @@ var addContent = function(req, cb)
 
     request.sys.type = "request";
     request.sys.link = uniqid();
-    request.sys.spaceId = req.spaceid;
     request.sys.issuer = req.userId;
     request.sys.issueDate = new Date();
     request.sys.spaceId = req.spaceId;
