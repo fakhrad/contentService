@@ -1,5 +1,5 @@
 var broker = require('../../rpcserver');
-function OnContentUnPublished(){
+function OnContentUpdated(){
     var _onOkCallBack
     function _onOk (result) {
         if (_onOkCallBack) {
@@ -21,5 +21,5 @@ function OnContentUnPublished(){
     }
 }
 
-exports.OnContentUnPublished = OnContentUnPublished;
+exports.OnContentUpdated = OnContentUpdated;
 
