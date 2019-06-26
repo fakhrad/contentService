@@ -251,7 +251,7 @@ var deleteContent = function(req, cb)
                 }
                 //Successfull. 
                 //Publish user account deleted event
-                contentRemoved.OnContentCreated().call(content);
+                contentRemoved.OnContentRemoved.call(content);
                 result.success = true;
                 result.data =  {"message" : "Deleted successfully"};
                 result.error = undefined;
@@ -470,7 +470,7 @@ var archiveContent = function(req, cb)
                 }
                 else
                 {
-                    archiveContent.contentArchived.call(content);
+                    contentArchived.OnContentArchived.call(content);
                     result.success = true;
                     result.data =  content;
                     result.error = undefined;
