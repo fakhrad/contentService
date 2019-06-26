@@ -1,5 +1,12 @@
 const Contents = require('../models/content');
 var uniqid = require('uniqid');
+var contentCreated = require('../events/contents/OnContentCreated');
+var contentPublised = require('../events/contents/OnContentPublished');
+var contentArchived = require('../events/contents/OnContentArchived');
+var contentRemoved = require('../events/contents/OnContentRemoved');
+var contentUnArchived = require('../events/contents/OnContentUnArchived');
+var contentUnPublished = require('../events/contents/OnContentUnPublished');
+var contentUpdated = require('../events/contents/OnContentUpdated');
 
 var filter = function(req, cb)
 {
@@ -208,7 +215,8 @@ var addContent = function(req, cb)
             return; 
         }
         //Successfull. 
-        //Publish user registered event
+        //Publish content created event
+        contentCreated.OnContentCreated().call(content);
         result.success = true;
         result.error = undefined;
         result.data =  content;
@@ -249,6 +257,7 @@ var deleteContent = function(req, cb)
                 }
                 //Successfull. 
                 //Publish user account deleted event
+                contentRemoved.OnContentCreated().call(content);
                 result.success = true;
                 result.data =  {"message" : "Deleted successfully"};
                 result.error = undefined;
@@ -322,6 +331,7 @@ var updateContent = function(req, cb)
                 }
                 //Successfull. 
                 //Publish user profile updated event
+                contentUpdated.OnContentUpdated.call(content);
                 Contents.findById(req.body.id).exec(function(err, content){
                     if(err)
                     {
@@ -377,6 +387,7 @@ var publishContent = function(req, cb)
                 }
                 else
                 {
+                    contentPublised.OnContentPublished.call(content);
                     result.success = true;
                     result.data =  content;
                     result.error = undefined;
@@ -421,6 +432,7 @@ var unPublishContent = function(req, cb)
                 }
                 else
                 {
+                    contentUnPublished.OnContentUnPublished.call(content);
                     result.success = true;
                     result.data =  content;
                     result.error = undefined;
@@ -465,6 +477,7 @@ var archiveContent = function(req, cb)
                 }
                 else
                 {
+                    archiveContent.contentArchived.call(content);
                     result.success = true;
                     result.data =  content;
                     result.error = undefined;
@@ -509,6 +522,7 @@ var unArchiveContent = function(req, cb)
                 }
                 else
                 {
+                    contentUnArchived.OnContentUnArchived.call(content);
                     result.success = true;
                     result.data =  content;
                     result.error = undefined;
