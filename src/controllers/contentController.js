@@ -11,8 +11,6 @@ var contentUpdated = require('../events/contents/OnContentUpdated');
 var filter = function(req, cb)
 {
     var c= undefined, ct, st;
-    if (req.body.category)
-        c = req.body.category.split(',');
     if (req.body.contentType)
         ct = req.body.contentType.split(',');
     if (req.body.status)
@@ -20,20 +18,17 @@ var filter = function(req, cb)
     var flt = {
         'sys.spaceId' : req.spaceId,
         name : req.body.name ,
-        category : { $in : c} ,
         contentType : { $in : ct},
         status : { $in : st} 
     };
     if (!req.body.name)
         delete flt.name;
-    if (!req.body.category)
-        delete flt.category;
     if (!req.body.contentType)
         delete flt.contentType;
     if (!req.body.status)
         delete flt.status;
     console.log(flt);
-    Contents.find(flt).populate('contentType', "title media").populate('category', 'name').select("fields.name fields.description status sys category contentType").exec(function(err, contents){
+    Contents.find(flt).populate('contentType', "title media").select("fields.name fields.description status sys contentType").exec(function(err, contents){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -62,7 +57,7 @@ var filter = function(req, cb)
 
 var loadContents = function(req, cb)
 {
-    Contents.find({"sys.spaceId" : req.spaceId}).populate('contentType', "title media").populate('category', 'name').select("fields.name fields.description status sys category contentType")
+    Contents.find({"sys.spaceId" : req.spaceId}).populate('contentType', "title media").select("fields.name fields.description status sys contentType")
     .exec(function(err, contents){
         var result = {success : false, data : null, error : null };
         if (err)
@@ -92,7 +87,7 @@ var loadContents = function(req, cb)
 
 var findAll = function(req, cb)
 {
-    Contents.find({"sys.spaceId" : req.spaceId}).populate('contentType', "title media").populate('category', 'name').select("fields.name fields.description status sys category contentType").exec(function(err, contents){
+    Contents.find({"sys.spaceId" : req.spaceId}).populate('contentType', "title media").select("fields.name fields.description status sys contentType").exec(function(err, contents){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -120,7 +115,7 @@ var findAll = function(req, cb)
 };
 var findById = function(req, cb)
 {
-    Contents.findById(req.body.id).populate('contentType').populate('category').exec(function(err, content){
+    Contents.findById(req.body.id).populate('contentType').exec(function(err, content){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -150,7 +145,7 @@ var findById = function(req, cb)
 var findByLink = function(req, cb)
 {
     console.log(req);
-    Contents.findOne({"sys.link" : req.body.link}).populate('contentType').populate('category').populate("sys.issuer").exec(function(err, content){
+    Contents.findOne({"sys.link" : req.body.link}).populate('contentType').populate("sys.issuer").exec(function(err, content){
         var result = {success : false, data : null, error : null };
         if (err)
         {
@@ -184,7 +179,6 @@ var addContent = function(req, cb)
         sys : {},
         fields: req.body.fields,
         contentType : req.body.contentType,
-        category : req.body.category,
         requestId : req.body.requestId,
         status : "draft",
         statusLog : []
@@ -304,7 +298,6 @@ var updateContent = function(req, cb)
         if (content)
         {
             content.fields = req.body.fields;
-            content.category = req.body.category;
             if (content.status != "draft")
             {
                 var newStatus = {}
