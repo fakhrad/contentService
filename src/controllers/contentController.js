@@ -269,7 +269,7 @@ var updateContent = function(req, cb) {
       //Object.assign(content.fields, req.body.fields);
       for (var fld in req.body.fields) {
         console.log(fld);
-        content.fields[fld] = fld;
+        content.fields[fld] = req.body.fields[fld];
       }
       //content.fields = req.body.fields;
       if (content.status != "draft") {
