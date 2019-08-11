@@ -272,7 +272,7 @@ var updateContent = function(req, cb) {
         content.fields[fld] = req.body.fields[fld];
         console.log(fld + " : " + content.fields[fld]);
       }
-      //content.fields = req.body.fields;
+      content.fields = req.body.fields;
       if (content.status != "draft") {
         var newStatus = {};
         newStatus.code = "changed";
