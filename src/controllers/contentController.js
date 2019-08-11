@@ -267,11 +267,11 @@ var updateContent = function(req, cb) {
     }
     if (content) {
       //Object.assign(content.fields, req.body.fields);
-      for (var fld in req.body.fields) {
-        console.log(fld + " : " + req.body.fields[fld]);
-        content.fields[fld] = req.body.fields[fld];
-        console.log(fld + " : " + content.fields[fld]);
-      }
+      //   for (var fld in req.body.fields) {
+      //     console.log(fld + " : " + req.body.fields[fld]);
+      //     content.fields[fld] = req.body.fields[fld];
+      //     console.log(fld + " : " + content.fields[fld]);
+      //   }
       content.fields = req.body.fields;
       if (content.status != "draft") {
         var newStatus = {};
