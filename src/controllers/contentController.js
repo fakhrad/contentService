@@ -266,7 +266,10 @@ var updateContent = function(req, cb) {
       return;
     }
     if (content) {
-      var set = content.fields;
+      var set = {};
+      for (var fld in content.fields) {
+        set[fld] = content.fields[fld];
+      }
       for (var fld in req.body.fields) {
         set[fld] = req.body.fields[fld];
       }
