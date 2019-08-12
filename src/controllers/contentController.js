@@ -266,13 +266,11 @@ var updateContent = function(req, cb) {
       return;
     }
     if (content) {
-      Object.assign(content.fields, req.body.fields);
-      //   for (var fld in req.body.fields) {
-      //     console.log(fld + " : " + req.body.fields[fld]);
-      //     content.fields[fld] = req.body.fields[fld];
-      //     console.log(fld + " : " + content.fields[fld]);
-      //   }
-      //content.fields = req.body.fields;
+      var set = content.fields;
+      for (var fld in req.body.fields) {
+        set[fld] = req.body.fields[fld];
+      }
+      content.fields = set;
       if (content.status != "draft") {
         var newStatus = {};
         newStatus.code = "changed";
