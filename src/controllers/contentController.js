@@ -1,4 +1,5 @@
 const Contents = require("../models/content");
+const ContentTypes = require("../models/contentType");
 var uniqid = require("uniqid");
 var contentCreated = require("../events/contents/OnContentCreated");
 var contentPublised = require("../events/contents/OnContentPublished");
@@ -8,6 +9,19 @@ var contentUnArchived = require("../events/contents/OnContentUnArchived");
 var contentUnPublished = require("../events/contents/OnContentUnPublished");
 var contentUpdated = require("../events/contents/OnContentUpdated");
 
+var newfilter = function(req, res, next) {
+  if (!req.query.contentType) throw new Error("Invalid contentType");
+  console.log(req.query);
+  Contents.find(req.query)
+    .select("fields sys.issuer, sys.issueDate _id, status")
+    .exec((err, cts) => {
+      if (err) {
+        res.status(500).send({ success: false, error: err });
+        return;
+      }
+      res.send({ success: true, error: undefined, data: cts });
+    });
+};
 var filter = function(req, cb) {
   var c = undefined,
     ct,
@@ -157,47 +171,198 @@ var findByLink = function(req, cb) {
       }
     });
 };
+
+/* 
+{
+    "_id": {
+        "$oid": "5d3af3a1a9602900177a5056"
+    },
+    "versioning": true,
+    "media": [
+        {
+            "en": "https://app-spanel.herokuapp.com/asset/download/file-1560064758966.jpg",
+            "fa": "https://app-spanel.herokuapp.com/asset/download/file-1560064758966.jpg",
+            "id": 0.08671568372870908
+        }
+    ],
+    "allowCustomFields": true,
+    "accessRight": false,
+    "fields": [
+        {
+            "name": "name",
+            "title": {
+                "fa": "نام حوزه",
+                "en": "نام حوزه"
+            },
+            "description": {
+                "fa": "نام حوزه فعالیت",
+                "en": "نام حوزه فعالیت"
+            },
+            "type": "string",
+            "isBase": true,
+            "isTranslate": true,
+            "isRequired": true,
+            "allowEdit": false,
+            "inVisible": false,
+            "appearance": "text",
+            "isMultiLine": false
+        },
+        {
+            "name": "thubmnail",
+            "title": {
+                "fa": "تصویر نمایه",
+                "en": "تصویر نمایه"
+            },
+            "description": {
+                "fa": "تصویر نمایه مربوط به حوزه فعالیت",
+                "en": "تصویر نمایه مربوط به حوزه فعالیت"
+            },
+            "type": "media",
+            "isTranslate": false,
+            "appearance": "default",
+            "isRequired": false,
+            "inVisible": false,
+            "isList": false,
+            "mediaType": [
+                "image"
+            ]
+        }
+    ],
+    "status": true,
+    "sys": {
+        "issueDate": {
+            "$date": "2019-07-26T12:35:45.595Z"
+        },
+        "type": "contentType",
+        "link": "fyga7injyk39zjv",
+        "issuer": {
+            "$oid": "5cf3883dafd0b9001708b27e"
+        },
+        "spaceId": "5cf3883dcce4de00174d48cf"
+    },
+    "name": "businessfields",
+    "title": {
+        "fa": "حوزه های فعالیت تجاری",
+        "en": "حوزه های فعالیت تجاری"
+    },
+    "description": {
+        "fa": "حوزه های فعالیت تجاری",
+        "en": "حوزه های فعالیت تجاری"
+    },
+    "template": "dataCollection",
+    "__v": 9
+}
+*/
+
+function isArray(obj) {
+  return Object.prototype.toString.call(obj) === "[object Array]";
+}
+
+var checkGeneralFieldValidation = function(field, value, errors) {
+  if (
+    field.isRequired &&
+    (value == undefined || value == null || value == "undefined")
+  ) {
+    var isRequired = {
+      field: field.name,
+      message: field.name + " is required"
+    };
+    errors.push(isRequired);
+    return false;
+  }
+  return true;
+};
+
+var checkStringFieldValidation = function(field, value, errors) {
+  if (
+    field.isRequired &&
+    (value == undefined ||
+      value == null ||
+      value == "undefined" ||
+      (value != undefined && value != null && value.length == 0))
+  ) {
+    var isRequired = {
+      field: field.name,
+      message: field.name + " is required"
+    };
+    errors.push(isRequired);
+    return false;
+  }
+  return true;
+};
 var addContent = function(req, cb) {
-  console.log(req);
-  var content = new Contents({
-    sys: {},
-    fields: req.body.fields,
-    contentType: req.body.contentType,
-    requestId: req.body.requestId,
-    status: "draft",
-    statusLog: []
-  });
-
-  var newStatus = {};
-  newStatus.code = "draft";
-  newStatus.applyDate = new Date();
-  newStatus.user = req.userId;
-  newStatus.description = "Item created";
-  content.status = "draft";
-  content.statusLog.push(newStatus);
-
-  content.sys.type = "content";
-  content.sys.link = uniqid();
-  content.sys.spaceId = req.spaceId;
-  content.sys.issuer = req.userId;
-  content.sys.issueDate = new Date();
-
-  content.save(function(err) {
-    var result = { success: false, data: null, error: null };
+  console.log(req.body);
+  ContentTypes.findById(req.body.contentType).exec((err, ctype) => {
     if (err) {
-      result.success = false;
-      result.data = undefined;
-      result.error = err;
-      cb(result);
+      res.status(500).send({ success: false, error: err });
       return;
     }
-    //Successfull.
-    //Publish content created event
-    contentCreated.OnContentCreated().call(content);
-    result.success = true;
-    result.error = undefined;
-    result.data = content;
-    cb(result);
+    if (!ctype) {
+      res.status(404).send({
+        success: false,
+        error: "ContentType not found for this space"
+      });
+      return;
+    }
+    var body = {};
+    for (var field in ctype.fields) {
+      var value = req.body.fields[field];
+      var errors = [];
+
+      switch (ctype.fields[field].type) {
+        case "string":
+          checkStringFieldValidation(field, value, errors);
+          break;
+        default:
+          checkGeneralFieldValidation(field, value, errors);
+      }
+      if (value == undefined) value = null;
+      body[field.name] = value;
+    }
+    if (errors.length > 0) {
+      cb({ success: false, error: errors, code: 422 });
+      return;
+    }
+    var content = new Contents({
+      sys: {},
+      fields: body,
+      contentType: req.body.contentType,
+      requestId: req.body.requestId,
+      status: "draft",
+      statusLog: []
+    });
+
+    var newStatus = {};
+    newStatus.code = "draft";
+    newStatus.applyDate = new Date();
+    newStatus.user = req.userId;
+    newStatus.description = "Item created";
+    content.status = "draft";
+    content.statusLog.push(newStatus);
+
+    content.sys.type = "content";
+    content.sys.link = uniqid();
+    content.sys.spaceId = req.spaceId;
+    content.sys.issuer = req.userId;
+    content.sys.issueDate = new Date();
+
+    content.save(function(err) {
+      var result = { success: false, data: null, error: null };
+      if (err) {
+        result.success = false;
+        result.data = undefined;
+        result.error = err;
+        cb(result);
+        return;
+      }
+      //Successfull.
+      //Publish content created event
+      contentCreated.OnContentCreated().call(content);
+      result.success = true;
+      result.error = undefined;
+      result.data = content;
+      cb(result);
+    });
   });
 };
 
