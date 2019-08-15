@@ -305,8 +305,9 @@ var addContent = function(req, cb) {
       return;
     }
     var body = {};
-    for (var field in ctype.fields) {
-      var value = req.body.fields[field];
+    for (i = 0; i < ctype.fields.length; i++) {
+      var field = ctype.fields[i];
+      var value = req.body.fields[field.name];
       var errors = [];
 
       switch (ctype.fields[field].type) {
@@ -316,16 +317,17 @@ var addContent = function(req, cb) {
         default:
           checkGeneralFieldValidation(field, value, errors);
       }
-      if (value == undefined) value = null;
+      if (value == undefined || value == "undefined") value = null;
       body[field.name] = value;
     }
+    console.log(body);
     if (errors.length > 0) {
       cb({ success: false, error: errors, code: 422 });
       return;
     }
     var content = new Contents({
       sys: {},
-      fields: body,
+      fields: req.body,
       contentType: req.body.contentType,
       requestId: req.body.requestId,
       status: "draft",
