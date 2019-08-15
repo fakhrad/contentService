@@ -294,11 +294,11 @@ var addContent = function(req, cb) {
   console.log(req.body);
   ContentTypes.findById(req.body.contentType).exec((err, ctype) => {
     if (err) {
-      res.status(500).send({ success: false, error: err });
+      cb({ success: false, error: err });
       return;
     }
     if (!ctype) {
-      res.status(404).send({
+      cb({
         success: false,
         error: "ContentType not found for this space"
       });
