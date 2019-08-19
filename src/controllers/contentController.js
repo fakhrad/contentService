@@ -326,12 +326,7 @@ var addContent = function(req, cb) {
   //     return;
   //   }
   // });
-  var d;
-  try {
-    d = JSON.parse(req.body);
-  } catch {
-    d = req.body;
-  }
+  var d = req.body;
   var content = new Contents({
     sys: {},
     fields: d,
