@@ -329,9 +329,8 @@ var addContent = function(req, cb) {
   var d = req.body;
   var content = new Contents({
     sys: {},
-    fields: d,
+    fields: req.body,
     contentType: req.body.contentType,
-    requestId: req.body.requestId,
     status: "draft",
     statusLog: []
   });
