@@ -364,6 +364,7 @@ var addContent = function(req, cb) {
     result.success = true;
     result.error = undefined;
     result.data = content;
+    content.setfields(d);
     cb(result);
   });
 };
