@@ -292,7 +292,7 @@ var checkStringFieldValidation = function(field, value, errors) {
 };
 var addContent = function(req, cb) {
   console.log(req);
-  if (req.body) console.log(JSON.parse(req.body.toString()));
+  //if (req.body) console.log(JSON.parse(req.body.toString()));
   // ContentTypes.findById(req.body.contentType).exec((err, ctype) => {
   //   if (err) {
   //     cb({ success: false, error: err });
@@ -349,7 +349,7 @@ var addContent = function(req, cb) {
   content.sys.spaceId = req.spaceId;
   content.sys.issuer = req.userId;
   content.sys.issueDate = new Date();
-  if (req.body) content.fields = JSON.parse(req.body).toString();
+  if (req.body) content.fields = req.body.fields;
   content.save(function(err) {
     var result = { success: false, data: null, error: null };
     if (err) {
