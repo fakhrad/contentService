@@ -329,7 +329,7 @@ var addContent = function(req, cb) {
   var d = req.body;
   var content = new Contents({
     sys: {},
-    fields: req.body,
+    fields: {},
     contentType: req.body.contentType,
     status: "draft",
     statusLog: []
@@ -364,7 +364,7 @@ var addContent = function(req, cb) {
     result.success = true;
     result.error = undefined;
     result.data = content;
-    content.setfields(d);
+    //content.setfields(d);
     cb(result);
   });
 };
