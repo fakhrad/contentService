@@ -291,8 +291,7 @@ var checkStringFieldValidation = function(field, value, errors) {
   return true;
 };
 var addContent = function(req, cb) {
-  console.log(req);
-  if (req.body) console.log(JSON.parse(req.body.toString()));
+  console.log(JSON.stringify(req));
   ContentTypes.findById(req.body.contentType).exec((err, ctype) => {
     if (err) {
       cb({ success: false, error: err });
