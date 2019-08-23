@@ -310,7 +310,7 @@ var addContent = function(req, cb) {
       var value = req.body.fields[field.name];
       var errors = [];
 
-      switch (fields.type) {
+      switch (field.type) {
         case "string":
           checkStringFieldValidation(field, value, errors);
           break;
