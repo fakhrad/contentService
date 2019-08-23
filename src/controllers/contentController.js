@@ -292,41 +292,41 @@ var checkStringFieldValidation = function(field, value, errors) {
 };
 var addContent = function(req, cb) {
   console.log(req);
-  //if (req.body) console.log(JSON.parse(req.body.toString()));
-  // ContentTypes.findById(req.body.contentType).exec((err, ctype) => {
-  //   if (err) {
-  //     cb({ success: false, error: err });
-  //     return;
-  //   }
-  //   if (!ctype) {
-  //     cb({
-  //       success: false,
-  //       error: "ContentType not found for this space"
-  //     });
-  //     return;
-  //   }
-  //   var body = {};
-  //   for (i = 0; i < ctype.fields.length; i++) {
-  //     var field = ctype.fields[i];
-  //     var value = req.body.fields[field.name];
-  //     var errors = [];
+  if (req.body) console.log(JSON.parse(req.body.toString()));
+  ContentTypes.findById(req.body.contentType).exec((err, ctype) => {
+    if (err) {
+      cb({ success: false, error: err });
+      return;
+    }
+    if (!ctype) {
+      cb({
+        success: false,
+        error: "ContentType not found for this space"
+      });
+      return;
+    }
+    var body = {};
+    for (i = 0; i < ctype.fields.length; i++) {
+      var field = ctype.fields[i];
+      var value = req.body.fields[field.name];
+      var errors = [];
 
-  //     switch (ctype.fields[field].type) {
-  //       case "string":
-  //         checkStringFieldValidation(field, value, errors);
-  //         break;
-  //       default:
-  //         checkGeneralFieldValidation(field, value, errors);
-  //     }
-  //     if (value == undefined || value == "undefined") value = null;
-  //     body[field["name"]] = value;
-  //   }
-  //   console.log(body);
-  //   if (errors.length > 0) {
-  //     cb({ success: false, error: errors, code: 422 });
-  //     return;
-  //   }
-  // });
+      switch (ctype.fields[field].type) {
+        case "string":
+          checkStringFieldValidation(field, value, errors);
+          break;
+        default:
+          checkGeneralFieldValidation(field, value, errors);
+      }
+      if (value == undefined || value == "undefined") value = null;
+      body[field["name"]] = value;
+    }
+    console.log(body);
+    if (errors.length > 0) {
+      cb({ success: false, error: errors, code: 422 });
+      return;
+    }
+  });
   var d = req.body;
   var content = new Contents({
     sys: {},
@@ -349,7 +349,7 @@ var addContent = function(req, cb) {
   content.sys.spaceId = req.spaceId;
   content.sys.issuer = req.userId;
   content.sys.issueDate = new Date();
-  if (req.body) content.fields = req.body.fields;
+  if (req.body) content.fields = body;
   content.save(function(err) {
     var result = { success: false, data: null, error: null };
     if (err) {
