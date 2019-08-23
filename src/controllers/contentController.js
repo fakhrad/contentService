@@ -325,47 +325,47 @@ var addContent = function(req, cb) {
       cb({ success: false, error: errors, code: 422 });
       return;
     }
-  });
-  var d = req.body;
-  var content = new Contents({
-    sys: {},
-    fields: {},
-    contentType: req.body.contentType,
-    status: "draft",
-    statusLog: []
-  });
+    var d = req.body;
+    var content = new Contents({
+      sys: {},
+      fields: {},
+      contentType: req.body.contentType,
+      status: "draft",
+      statusLog: []
+    });
 
-  var newStatus = {};
-  newStatus.code = "draft";
-  newStatus.applyDate = new Date();
-  newStatus.user = req.userId;
-  newStatus.description = "Item created";
-  content.status = "draft";
-  content.statusLog.push(newStatus);
+    var newStatus = {};
+    newStatus.code = "draft";
+    newStatus.applyDate = new Date();
+    newStatus.user = req.userId;
+    newStatus.description = "Item created";
+    content.status = "draft";
+    content.statusLog.push(newStatus);
 
-  content.sys.type = "content";
-  content.sys.link = uniqid();
-  content.sys.spaceId = req.spaceId;
-  content.sys.issuer = req.userId;
-  content.sys.issueDate = new Date();
-  if (req.body) content.fields = body;
-  content.save(function(err) {
-    var result = { success: false, data: null, error: null };
-    if (err) {
-      result.success = false;
-      result.data = undefined;
-      result.error = err;
+    content.sys.type = "content";
+    content.sys.link = uniqid();
+    content.sys.spaceId = req.spaceId;
+    content.sys.issuer = req.userId;
+    content.sys.issueDate = new Date();
+    if (body) content.fields = body;
+    content.save(function(err) {
+      var result = { success: false, data: null, error: null };
+      if (err) {
+        result.success = false;
+        result.data = undefined;
+        result.error = err;
+        cb(result);
+        return;
+      }
+      //Successfull.
+      //Publish content created event
+      contentCreated.OnContentCreated().call(content);
+      result.success = true;
+      result.error = undefined;
+      result.data = content;
+      //content.setfields(d);
       cb(result);
-      return;
-    }
-    //Successfull.
-    //Publish content created event
-    contentCreated.OnContentCreated().call(content);
-    result.success = true;
-    result.error = undefined;
-    result.data = content;
-    //content.setfields(d);
-    cb(result);
+    });
   });
 };
 
