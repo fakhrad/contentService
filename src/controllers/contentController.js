@@ -434,39 +434,61 @@ var updateContent = function(req, cb) {
       return;
     }
     if (content) {
-      var set = {};
-      for (var fld in content.fields) {
-        set[fld] = content.fields[fld];
-      }
-      for (var fld in req.body.fields) {
-        set[fld] = req.body.fields[fld];
-      }
-      content.fields = set;
-      if (content.status != "draft") {
-        var newStatus = {};
-        newStatus.code = "changed";
-        newStatus.applyDate = new Date();
-        newStatus.user = req.userId;
-        newStatus.description = "Item updated";
-        content.status = "changed";
-        content.statusLog.push(newStatus);
-      }
-      content.sys.lastUpdater = req.userId;
-      if (req.body.contentType) content.contentType = req.body.contentType;
-      content.sys.lastUpdateTime = new Date();
-      content.requestId = req.body.requestId;
-      content.save(function(err) {
+      ContentTypes.findById(req.body.contentType).exec((err, ctype) => {
         if (err) {
-          result.success = false;
-          result.data = undefined;
-          result.error = err;
-          cb(result);
+          cb({ success: false, error: err });
           return;
         }
-        //Successfull.
-        //Publish user profile updated event
-        contentUpdated.OnContentUpdated.call(content);
-        Contents.findById(req.body.id).exec(function(err, content) {
+        if (!ctype) {
+          cb({
+            success: false,
+            error: "ContentType not found for this space"
+          });
+          return;
+        }
+        var body = {};
+        for (i = 0; i < ctype.fields.length; i++) {
+          var field = ctype.fields[i];
+          var value = req.body.fields[field.name];
+          var errors = [];
+
+          switch (field.type) {
+            case "string":
+              checkStringFieldValidation(field, value, errors);
+              break;
+            default:
+              checkGeneralFieldValidation(field, value, errors);
+          }
+          if (value == undefined || value == "undefined") value = null;
+          body[field["name"]] = value;
+        }
+        console.log(body);
+        if (errors.length > 0) {
+          cb({ success: false, error: errors, code: 422 });
+          return;
+        }
+        var set = {};
+        for (var fld in content.fields) {
+          set[fld] = content.fields[fld];
+        }
+        for (var fld in body) {
+          set[fld] = body[fld];
+        }
+        content.fields = set;
+        if (content.status != "draft") {
+          var newStatus = {};
+          newStatus.code = "changed";
+          newStatus.applyDate = new Date();
+          newStatus.user = req.userId;
+          newStatus.description = "Item updated";
+          content.status = "changed";
+          content.statusLog.push(newStatus);
+        }
+        content.sys.lastUpdater = req.userId;
+        if (req.body.contentType) content.contentType = req.body.contentType;
+        content.sys.lastUpdateTime = new Date();
+        content.requestId = req.body.requestId;
+        content.save(function(err) {
           if (err) {
             result.success = false;
             result.data = undefined;
@@ -474,14 +496,26 @@ var updateContent = function(req, cb) {
             cb(result);
             return;
           }
-          result.success = true;
-          result.error = undefined;
-          result.data = content;
-          cb(result);
-          return;
+          //Successfull.
+          //Publish user profile updated event
+          contentUpdated.OnContentUpdated.call(content);
+          Contents.findById(req.body.id).exec(function(err, content) {
+            if (err) {
+              result.success = false;
+              result.data = undefined;
+              result.error = err;
+              cb(result);
+              return;
+            }
+            result.success = true;
+            result.error = undefined;
+            result.data = content;
+            cb(result);
+            return;
+          });
         });
+        return;
       });
-      return;
     } else {
       result.success = false;
       result.data = undefined;
