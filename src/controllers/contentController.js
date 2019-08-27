@@ -8,6 +8,7 @@ var contentRemoved = require("../events/contents/OnContentRemoved");
 var contentUnArchived = require("../events/contents/OnContentUnArchived");
 var contentUnPublished = require("../events/contents/OnContentUnPublished");
 var contentUpdated = require("../events/contents/OnContentUpdated");
+var contentSubmitted = require("../events/contents/OnContentSubmitted");
 
 var newfilter = function(req, res, next) {
   if (!req.query.contentType) throw new Error("Invalid contentType");
@@ -172,88 +173,6 @@ var findByLink = function(req, cb) {
     });
 };
 
-/* 
-{
-    "_id": {
-        "$oid": "5d3af3a1a9602900177a5056"
-    },
-    "versioning": true,
-    "media": [
-        {
-            "en": "https://app-spanel.herokuapp.com/asset/download/file-1560064758966.jpg",
-            "fa": "https://app-spanel.herokuapp.com/asset/download/file-1560064758966.jpg",
-            "id": 0.08671568372870908
-        }
-    ],
-    "allowCustomFields": true,
-    "accessRight": false,
-    "fields": [
-        {
-            "name": "name",
-            "title": {
-                "fa": "نام حوزه",
-                "en": "نام حوزه"
-            },
-            "description": {
-                "fa": "نام حوزه فعالیت",
-                "en": "نام حوزه فعالیت"
-            },
-            "type": "string",
-            "isBase": true,
-            "isTranslate": true,
-            "isRequired": true,
-            "allowEdit": false,
-            "inVisible": false,
-            "appearance": "text",
-            "isMultiLine": false
-        },
-        {
-            "name": "thubmnail",
-            "title": {
-                "fa": "تصویر نمایه",
-                "en": "تصویر نمایه"
-            },
-            "description": {
-                "fa": "تصویر نمایه مربوط به حوزه فعالیت",
-                "en": "تصویر نمایه مربوط به حوزه فعالیت"
-            },
-            "type": "media",
-            "isTranslate": false,
-            "appearance": "default",
-            "isRequired": false,
-            "inVisible": false,
-            "isList": false,
-            "mediaType": [
-                "image"
-            ]
-        }
-    ],
-    "status": true,
-    "sys": {
-        "issueDate": {
-            "$date": "2019-07-26T12:35:45.595Z"
-        },
-        "type": "contentType",
-        "link": "fyga7injyk39zjv",
-        "issuer": {
-            "$oid": "5cf3883dafd0b9001708b27e"
-        },
-        "spaceId": "5cf3883dcce4de00174d48cf"
-    },
-    "name": "businessfields",
-    "title": {
-        "fa": "حوزه های فعالیت تجاری",
-        "en": "حوزه های فعالیت تجاری"
-    },
-    "description": {
-        "fa": "حوزه های فعالیت تجاری",
-        "en": "حوزه های فعالیت تجاری"
-    },
-    "template": "dataCollection",
-    "__v": 9
-}
-*/
-
 function isArray(obj) {
   return Object.prototype.toString.call(obj) === "[object Array]";
 }
@@ -348,6 +267,7 @@ var addContent = function(req, cb) {
     content.sys.issuer = req.userId;
     content.sys.issueDate = new Date();
     if (body) content.fields = body;
+    var sendMail = false;
     content.save(function(err) {
       var result = { success: false, data: null, error: null };
       if (err) {
@@ -370,8 +290,11 @@ var addContent = function(req, cb) {
 };
 
 var submit = function(req, cb) {
-  if (request.body.content) this.update(req, cb);
-  else this.addContent(req, cb);
+  this.addContent(req, data => {
+    //Publish content submitted event
+    contentSubmitted.OnContentSubmitted().call(content);
+    if (cb) cb(data);
+  });
 };
 
 var deleteContent = function(req, cb) {
@@ -434,7 +357,7 @@ var updateContent = function(req, cb) {
       return;
     }
     if (content) {
-      ContentTypes.findById(req.body.contentType).exec((err, ctype) => {
+      ContentTypes.findById(content.contentType).exec((err, ctype) => {
         if (err) {
           cb({ success: false, error: err });
           return;

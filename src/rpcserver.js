@@ -548,7 +548,7 @@ function whenConnected() {
           });
       });
 
-      ch.assertQueue("submitrequest", {durable: false}, (err, q)=>{
+      ch.assertQueue("submitcontent", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));
             try{
