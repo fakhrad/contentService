@@ -294,7 +294,7 @@ var submit = function(req, cb) {
   addContent(req, data => {
     //Publish content submitted event
     console.log("publish submit content event");
-    contentSubmitted.OnContentSubmitted().call(content);
+    contentSubmitted.OnContentSubmitted().call(data);
     if (cb) cb(data);
   });
 };
