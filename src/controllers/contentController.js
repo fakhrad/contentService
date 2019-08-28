@@ -291,7 +291,7 @@ var addContent = function(req, cb) {
 
 var submit = function(req, cb) {
   console.log("submit content started");
-  this.addContent(req, data => {
+  addContent(req, data => {
     //Publish content submitted event
     console.log("publish submit content event");
     contentSubmitted.OnContentSubmitted().call(content);
