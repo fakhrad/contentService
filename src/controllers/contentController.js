@@ -148,7 +148,6 @@ var findByLink = function(req, cb) {
   console.log(req);
   Contents.findOne({ "sys.link": req.body.link })
     .populate("contentType")
-    .populate("sys.issuer")
     .exec(function(err, content) {
       var result = { success: false, data: null, error: null };
       if (err) {
