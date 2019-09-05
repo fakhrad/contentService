@@ -24,6 +24,12 @@ var newfilter = function(req, res, next) {
     });
 };
 var filter = function(req, cb) {
+  var skip = req.query.skip || 0;
+  delete req.query.skip;
+  var limit = req.query.limit || 100;
+  delete req.query.limit;
+  var sort = req.query.sort || "sys.issueDate";
+  delete req.query.sort;
   var c = undefined,
     ct,
     st;
@@ -42,6 +48,9 @@ var filter = function(req, cb) {
   Contents.find(flt)
     .populate("contentType", "title media")
     .select("fields.name fields.description status sys contentType")
+    .skip(skip)
+    .limit(limit)
+    .sort(sort)
     .exec(function(err, contents) {
       var result = { success: false, data: null, error: null };
       if (err) {
@@ -66,9 +75,18 @@ var filter = function(req, cb) {
 };
 
 var loadContents = function(req, cb) {
+  var skip = req.query.skip || 0;
+  delete req.query.skip;
+  var limit = req.query.limit || 100;
+  delete req.query.limit;
+  var sort = req.query.sort || "sys.issueDate";
+  delete req.query.sort;
   Contents.find({ "sys.spaceId": req.spaceId })
     .populate("contentType", "title media")
     .select("fields.name fields.description status sys contentType")
+    .skip(skip)
+    .limit(limit)
+    .sort(sort)
     .exec(function(err, contents) {
       var result = { success: false, data: null, error: null };
       if (err) {
@@ -93,9 +111,18 @@ var loadContents = function(req, cb) {
 };
 
 var findAll = function(req, cb) {
+  var skip = req.query.skip || 0;
+  delete req.query.skip;
+  var limit = req.query.limit || 100;
+  delete req.query.limit;
+  var sort = req.query.sort || "sys.issueDate";
+  delete req.query.sort;
   Contents.find({ "sys.spaceId": req.spaceId })
     .populate("contentType", "title media")
     .select("fields.name fields.description status sys contentType")
+    .skip(skip)
+    .limit(limit)
+    .sort(sort)
     .exec(function(err, contents) {
       var result = { success: false, data: null, error: null };
       if (err) {
