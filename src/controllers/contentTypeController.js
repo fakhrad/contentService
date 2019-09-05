@@ -11,8 +11,8 @@ var getContentTypes = function(req, cb) {
     delete req.query.limit;
     delete req.query.sort;
   }
-  ContentTypes.find({ "sys.spaceId": req.spaceId });
-  skip(skip)
+  ContentTypes.find({ "sys.spaceId": req.spaceId })
+    .skip(skip)
     .limit(limit)
     .sort(sort)
     .exec(function(err, contentTypes) {
