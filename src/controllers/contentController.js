@@ -25,7 +25,7 @@ var newfilter = function(req, res, next) {
 };
 var filter = function(req, cb) {
   var skip = req.query ? req.query.skip || 0 : 0;
-  var limit = req.query ? req.query.limit || 100 : 100;
+  var limit = req.query ? req.query.limit || 10000 : 10000;
   var sort = req.query ? req.query.sort || "-sys.issueDate" : "-sys.issueDate";
   if (req.query) {
     delete req.query.skip;
@@ -78,7 +78,7 @@ var filter = function(req, cb) {
 
 var loadContents = function(req, cb) {
   var skip = req.query ? req.query.skip || 0 : 0;
-  var limit = req.query ? req.query.limit || 100 : 100;
+  var limit = req.query ? req.query.limit || 10000 : 10000;
   var sort = req.query ? req.query.sort || "-sys.issueDate" : "-sys.issueDate";
   if (req.query) {
     delete req.query.skip;
@@ -116,7 +116,7 @@ var loadContents = function(req, cb) {
 
 var findAll = function(req, cb) {
   var skip = req.query ? req.query.skip || 0 : 0;
-  var limit = req.query ? req.query.limit || 100 : 100;
+  var limit = req.query ? req.query.limit || 10000 : 10000;
   var sort = req.query ? req.query.sort || "-sys.issueDate" : "-sys.issueDate";
   if (req.query) {
     delete req.query.skip;
