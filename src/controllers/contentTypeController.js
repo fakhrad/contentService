@@ -5,7 +5,7 @@ var uniqid = require("uniqid");
 var getContentTypes = function(req, cb) {
   var skip = req.query ? req.query.skip || 0 : 0;
   var limit = req.query ? req.query.limit || 10000 : 10000;
-  var sort = req.query ? req.query.sort || "-name" : "-name";
+  var sort = req.query ? req.query.sort || "-sys.issueDate" : "-sys.issueDate";
   if (req.query) {
     delete req.query.skip;
     delete req.query.limit;
