@@ -11,7 +11,7 @@ var contentUpdated = require("../events/contents/OnContentUpdated");
 var contentSubmitted = require("../events/contents/OnContentSubmitted");
 
 var newfilter = function(req, res, next) {
-  if (!req.query.contentType) throw new Error("Invalid contentType");
+  if (!req.body.contentType) throw new Error("Invalid contentType");
   console.log(req.query);
   Contents.find(req.query)
     .select("fields sys.issuer, sys.issueDate _id, status")
@@ -600,14 +600,14 @@ var unArchiveContent = function(req, cb) {
 };
 
 exports.query = function(req, res, next) {
-  console.log(req.query);
-  var skip = parseInt(req.query.skip) || 0;
-  delete req.query.skip;
-  var limit = parseInt(req.query.limit) || 100;
-  delete req.query.limit;
-  var sort = req.query.sort || "sys.issueDate";
-  delete req.query.sort;
-  Contents.find(req.query)
+  console.log(req.body);
+  var skip = parseInt(req.body.skip) || 0;
+  delete req.body.skip;
+  var limit = parseInt(req.body.limit) || 100;
+  delete req.body.limit;
+  var sort = req.body.sort || "sys.issueDate";
+  delete req.body.sort;
+  Contents.find(req.body)
     .select("fields sys.issuer, sys.issueDate _id, status")
     .populate("contentType", "_id title")
     .skip(skip)
