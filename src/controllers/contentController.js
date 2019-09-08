@@ -599,7 +599,7 @@ var unArchiveContent = function(req, cb) {
   });
 };
 
-exports.query = function(req, res, next) {
+exports.query = function(req, cb) {
   console.log(req.body);
   var skip = parseInt(req.body.skip) || 0;
   delete req.body.skip;
@@ -615,7 +615,7 @@ exports.query = function(req, res, next) {
     .sort(sort)
     .exec((err, cts) => {
       if (err) {
-        res.status(500).send({ success: false, error: err });
+        cb({ success: false, error: err });
         return;
       }
       try {
@@ -628,7 +628,7 @@ exports.query = function(req, res, next) {
         var ids = [];
         ContentTypes.find({ _id: { $in: ctypes } }).exec((err, ttypes) => {
           if (err) {
-            res.send(cts);
+            cb(cts);
             return;
           } else {
             ttypes.forEach(ctype => {
@@ -680,7 +680,7 @@ exports.query = function(req, res, next) {
               .select("fields _id")
               .exec((err, rels) => {
                 if (err) {
-                  res.send(cts);
+                  cb(cts);
                   return;
                 }
                 for (var l = 0; l < ttypes.length; l++) {
@@ -752,13 +752,13 @@ exports.query = function(req, res, next) {
                     }
                   });
                 }
-                res.send(cts);
+                cb(cts);
               });
           }
         });
       } catch (e) {
         console.log(e);
-        res.send(cts);
+        cb(cts);
       }
     });
 };
