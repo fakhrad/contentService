@@ -457,6 +457,24 @@ function whenConnected() {
 
           });
       });
+      ch.assertQueue("partialupdatecontent", {durable: false}, (err, q)=>{
+        ch.consume(q.queue, function reply(msg) {
+            var req = JSON.parse(msg.content.toString('utf8'));
+            try{
+              contentController.partialupdate(req, (result)=>{
+                ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId } );
+                ch.ack(msg);
+              });
+            }
+            catch(ex)
+            {
+              console.log(ex);
+              ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId } );
+                  ch.ack(msg);
+            } 
+
+          });
+      });
       ch.assertQueue("removecontent", {durable: false}, (err, q)=>{
         ch.consume(q.queue, function reply(msg) {
             var req = JSON.parse(msg.content.toString('utf8'));

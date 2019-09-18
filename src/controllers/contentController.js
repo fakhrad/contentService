@@ -449,6 +449,75 @@ var updateContent = function(req, cb) {
   });
 };
 
+var partialUpdateContent = function(req, cb) {
+  if (!req.body) {
+    var result = { success: false, data: null, error: null };
+    if (err) {
+      result.success = false;
+      result.data = undefined;
+      result.error = "Invalid request";
+      cb(result);
+      return;
+    }
+  }
+  Contents.findById(req.body.id).exec(function(err, content) {
+    var result = { success: false, data: null, error: null };
+    if (err) {
+      result.success = false;
+      result.data = undefined;
+      result.error = err;
+      cb(result);
+      return;
+    }
+    if (content) {
+      var set = {};
+      for (var fld in content.fields) {
+        set[fld] = content.fields[fld];
+      }
+      for (var fld in req.body.fields) {
+        set[fld] = req.body.fields[fld];
+      }
+      content.fields = set;
+      content.sys.lastUpdater = req.userId;
+      if (req.body.contentType) content.contentType = req.body.contentType;
+      content.sys.lastUpdateTime = new Date();
+      content.requestId = req.body.requestId;
+      content.save(function(err) {
+        if (err) {
+          result.success = false;
+          result.data = undefined;
+          result.error = err;
+          cb(result);
+          return;
+        }
+        //Successfull.
+        //Publish user profile updated event
+        contentUpdated.OnContentUpdated.call(content);
+        Contents.findById(req.body.id).exec(function(err, content) {
+          if (err) {
+            result.success = false;
+            result.data = undefined;
+            result.error = err;
+            cb(result);
+            return;
+          }
+          result.success = true;
+          result.error = undefined;
+          result.data = content;
+          cb(result);
+          return;
+        });
+      });
+      return;
+    } else {
+      result.success = false;
+      result.data = undefined;
+      result.error = undefined;
+      cb(result);
+      return;
+    }
+  });
+};
 var publishContent = function(req, cb) {
   Contents.findById(req.body.id).exec(function(err, content) {
     var result = { success: false, data: null, error: null };
@@ -605,7 +674,7 @@ exports.query = function(req, cb) {
   delete req.body.skip;
   var limit = parseInt(req.body.limit) || 100;
   delete req.body.limit;
-  var sort = req.body.sort || "sys.issueDate";
+  var sort = req.body.sort || "-sys.issueDate";
   delete req.body.sort;
   Contents.find(req.body)
     .select("fields sys.issuer, sys.issueDate _id, status")
@@ -769,6 +838,7 @@ exports.findByLink = findByLink;
 exports.add = addContent;
 exports.delete = deleteContent;
 exports.update = updateContent;
+exports.partialupdate = partialUpdateContent;
 exports.submit = submit;
 exports.load = loadContents;
 exports.publish = publishContent;
