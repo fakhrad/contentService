@@ -281,16 +281,16 @@ var addContent = function(req, cb) {
       sys: {},
       fields: {},
       contentType: req.body.contentType,
-      status: "draft",
+      status: "published",
       statusLog: []
     });
 
     var newStatus = {};
-    newStatus.code = "draft";
+    newStatus.code = "published";
     newStatus.applyDate = new Date();
     newStatus.user = req.userId;
     newStatus.description = "Item created";
-    content.status = "draft";
+    content.status = "published";
     content.statusLog.push(newStatus);
 
     content.sys.type = "content";
