@@ -190,7 +190,7 @@ var findByLink = function(req, cb) {
         cb(result);
         return;
       }
-      if (request) {
+      if (content) {
         result.success = true;
         result.error = undefined;
 
