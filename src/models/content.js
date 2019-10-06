@@ -44,7 +44,9 @@ content.methods.publish = function(user, description, cb) {
 content.methods.unPublish = function(cb) {
   if (this.status === "published" && this.statusLog.length > 0) {
     this.statusLog.pop();
-    this.status = this.statusLog[this.statusLog.length - 1].code;
+    this.status = this.statusLog[this.statusLog.length - 1]
+      ? this.statusLog[this.statusLog.length - 1].code
+      : "draft";
     this.save(cb);
   } else cb("Error in unPublishing item!");
 };
@@ -65,7 +67,9 @@ content.methods.archive = function(user, description, cb) {
 content.methods.unArchive = function(cb) {
   if (this.status === "archived" && this.statusLog.length > 0) {
     this.statusLog.pop();
-    this.status = this.statusLog[this.statusLog.length - 1].code;
+    this.status = this.statusLog[this.statusLog.length - 1]
+      ? this.statusLog[this.statusLog.length - 1].code
+      : "draft";
     this.save(cb);
   } else cb("Error in unArchiving item!");
 };
