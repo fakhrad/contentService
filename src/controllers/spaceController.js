@@ -169,6 +169,55 @@ var updateSpace = function(req, cb) {
   });
 };
 
+var setRoles = function(req, cb) {
+  Space.findById(req.body.id).exec(function(err, space) {
+    console.log(space);
+    var result = { success: false, data: null, error: null };
+    if (err) {
+      result.success = false;
+      result.data = undefined;
+      result.error = err;
+      cb(result);
+      return;
+    }
+    if (space) {
+      (space.roles = req.body.roles), console.log("save space");
+      space.save(function(err) {
+        if (err) {
+          result.success = false;
+          result.data = undefined;
+          result.error = err;
+          cb(result);
+          return;
+        }
+        console.log("return to user");
+        //Successfull.
+        //Publish user profile updated event
+        Space.findById(req.body.id).exec(function(err, space) {
+          if (err) {
+            result.success = false;
+            result.data = undefined;
+            result.error = err;
+            cb(result);
+            return;
+          }
+          result.success = true;
+          result.error = undefined;
+          result.data = space;
+          cb(result);
+        });
+      });
+      return;
+    } else {
+      result.success = false;
+      result.data = undefined;
+      result.error = undefined;
+      cb(result);
+      return;
+    }
+  });
+};
+
 var setLocales = function(req, cb) {
   Space.findById(req.body.id).exec(function(err, space) {
     console.log(space);

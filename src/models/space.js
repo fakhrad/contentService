@@ -14,7 +14,7 @@ const space = new Schema({
   image: { type: Object },
   type: { type: String },
   notification_email: { type: String },
-  owner: { type: Schema.Types.ObjectId, ref: "Systemuser", required: true },
+  owner: { type: Schema.Types.ObjectId, ref: "AdminUsers", required: true },
   roles: [],
   locales: [],
   webhooks: []
