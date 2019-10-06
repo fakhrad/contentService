@@ -363,6 +363,7 @@ exports.addSpace = addSpace;
 exports.deleteSpace = deleteSpace;
 exports.updateSpace = updateSpace;
 exports.findbyid = findById;
+exports.setRoles = setRoles;
 exports.setLocales = setLocales;
 exports.setWebhooks = setWebhooks;
 exports.getWebhooks = getWebhooks;
