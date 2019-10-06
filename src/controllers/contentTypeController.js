@@ -1,4 +1,5 @@
 var ContentTypes = require("../models/contentType");
+var Templates = require("../models/templates");
 var Space = require("../models/space");
 var uniqid = require("uniqid");
 
@@ -31,6 +32,31 @@ var getContentTypes = function(req, cb) {
     });
 };
 
+var getContentTemplates = function(req, cb) {
+  var skip = req.query ? req.query.skip || 0 : 0;
+  var limit = req.query ? req.query.limit || 10000 : 10000;
+  if (req.query) {
+    delete req.query.skip;
+    delete req.query.limit;
+  }
+  Templates.find()
+    .skip(skip)
+    .limit(limit)
+    .exec(function(err, templates) {
+      var result = { success: false, data: null, error: null };
+      if (err) {
+        result.success = false;
+        result.data = undefined;
+        result.error = err;
+        cb(result);
+        return;
+      }
+      result.success = true;
+      result.error = undefined;
+      result.data = templates;
+      cb(result);
+    });
+};
 var findById = function(req, cb) {
   ContentTypes.findById(req.body.id).exec(function(err, contentTypes) {
     var result = { success: false, data: null, error: null };
@@ -211,6 +237,7 @@ var deleteContentTypes = function(req, cb) {
   });
 };
 exports.getContentTypes = getContentTypes;
+exports.getContentTemplates = getContentTemplates;
 exports.findbyid = findById;
 exports.addContentTypes = addContentTypes;
 exports.updateContentType = updateContentType;
