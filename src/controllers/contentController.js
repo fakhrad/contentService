@@ -42,7 +42,8 @@ var filter = function(req, cb) {
     contentType: { $in: ct },
     status: { $in: st }
   };
-  if (req.body.name) flt["fields.name"] = req.body.name;
+  if (req.body.name)
+    flt["fields.name"] = { $regex: ".*" + req.body.name + ".*" };
   if (!req.body.contentType) delete flt.contentType;
   if (!req.body.status) delete flt.status;
   console.log(flt);
