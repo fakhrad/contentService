@@ -370,6 +370,24 @@ var deleteContent = function(req, cb) {
   });
 };
 
+var deleteContentByFilter = function(req, cb) {
+  Contents.deleteMany(req.body).exec(function(err) {
+    var result = { success: false, data: null, error: null };
+    if (err) {
+      result.success = false;
+      result.data = undefined;
+      result.error = err;
+      cb(result);
+      return;
+    } else {
+      result.success = false;
+      result.data = undefined;
+      result.error = undefined;
+      cb(result);
+      return;
+    }
+  });
+};
 var updateContent = function(req, cb) {
   if (!req.body) {
     var result = { success: false, data: null, error: null };
@@ -837,6 +855,7 @@ exports.findById = findById;
 exports.findByLink = findByLink;
 exports.add = addContent;
 exports.delete = deleteContent;
+exports.deleteMany = deleteContentByFilter;
 exports.update = updateContent;
 exports.partialupdate = partialUpdateContent;
 exports.submit = submit;
