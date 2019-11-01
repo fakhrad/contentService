@@ -256,6 +256,10 @@ var addContent = function(req, cb) {
         });
         return;
       }
+      if (!req.body || (req.body && !req.body.fields)) {
+        cb({ success: false, error: "Invalid request" });
+        return;
+      }
       var body = {};
       for (i = 0; i < ctype.fields.length; i++) {
         var field = ctype.fields[i];
