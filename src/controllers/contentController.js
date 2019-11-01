@@ -242,83 +242,87 @@ var checkStringFieldValidation = function(field, value, errors) {
   return true;
 };
 var addContent = function(req, cb) {
-  console.log(JSON.stringify(req));
-  ContentTypes.findById(req.body.contentType).exec((err, ctype) => {
-    if (err) {
-      cb({ success: false, error: err });
-      return;
-    }
-    if (!ctype) {
-      cb({
-        success: false,
-        error: "ContentType not found for this space"
-      });
-      return;
-    }
-    var body = {};
-    for (i = 0; i < ctype.fields.length; i++) {
-      var field = ctype.fields[i];
-      var value = req.body.fields[field.name];
-      var errors = [];
-
-      switch (field.type) {
-        case "string":
-          checkStringFieldValidation(field, value, errors);
-          break;
-        default:
-          checkGeneralFieldValidation(field, value, errors);
-      }
-      if (value == undefined || value == "undefined") value = null;
-      body[field["name"]] = value;
-    }
-    console.log(body);
-    if (errors.length > 0) {
-      cb({ success: false, error: errors, code: 422 });
-      return;
-    }
-    var d = req.body;
-    var content = new Contents({
-      sys: {},
-      fields: {},
-      contentType: req.body.contentType,
-      status: "published",
-      statusLog: []
-    });
-
-    var newStatus = {};
-    newStatus.code = "published";
-    newStatus.applyDate = new Date();
-    newStatus.user = req.userId;
-    newStatus.description = "Item created";
-    content.status = "published";
-    content.statusLog.push(newStatus);
-
-    content.sys.type = "content";
-    content.sys.link = uniqid();
-    content.sys.spaceId = req.spaceId;
-    content.sys.issuer = req.userId;
-    content.sys.issueDate = new Date();
-    if (body) content.fields = body;
-    var sendMail = false;
-    content.save(function(err) {
-      var result = { success: false, data: null, error: null };
+  try {
+    console.log(JSON.stringify(req));
+    ContentTypes.findById(req.body.contentType).exec((err, ctype) => {
       if (err) {
-        result.success = false;
-        result.data = undefined;
-        result.error = err;
-        cb(result);
+        cb({ success: false, error: err });
         return;
       }
-      //Successfull.
-      //Publish content created event
-      contentCreated.OnContentCreated().call(content);
-      result.success = true;
-      result.error = undefined;
-      result.data = content;
-      //content.setfields(d);
-      cb(result);
+      if (!ctype) {
+        cb({
+          success: false,
+          error: "ContentType not found for this space"
+        });
+        return;
+      }
+      var body = {};
+      for (i = 0; i < ctype.fields.length; i++) {
+        var field = ctype.fields[i];
+        var value = req.body.fields[field.name];
+        var errors = [];
+
+        switch (field.type) {
+          case "string":
+            checkStringFieldValidation(field, value, errors);
+            break;
+          default:
+            checkGeneralFieldValidation(field, value, errors);
+        }
+        if (value == undefined || value == "undefined") value = null;
+        body[field["name"]] = value;
+      }
+      console.log(body);
+      if (errors.length > 0) {
+        cb({ success: false, error: errors, code: 422 });
+        return;
+      }
+      var d = req.body;
+      var content = new Contents({
+        sys: {},
+        fields: {},
+        contentType: req.body.contentType,
+        status: "published",
+        statusLog: []
+      });
+
+      var newStatus = {};
+      newStatus.code = "published";
+      newStatus.applyDate = new Date();
+      newStatus.user = req.userId;
+      newStatus.description = "Item created";
+      content.status = "published";
+      content.statusLog.push(newStatus);
+
+      content.sys.type = "content";
+      content.sys.link = uniqid();
+      content.sys.spaceId = req.spaceId;
+      content.sys.issuer = req.userId;
+      content.sys.issueDate = new Date();
+      if (body) content.fields = body;
+      var sendMail = false;
+      content.save(function(err) {
+        var result = { success: false, data: null, error: null };
+        if (err) {
+          result.success = false;
+          result.data = undefined;
+          result.error = err;
+          cb(result);
+          return;
+        }
+        //Successfull.
+        //Publish content created event
+        contentCreated.OnContentCreated().call(content);
+        result.success = true;
+        result.error = undefined;
+        result.data = content;
+        //content.setfields(d);
+        cb(result);
+      });
     });
-  });
+  } catch (ex) {
+    console.log(ex);
+  }
 };
 
 var submit = function(req, cb) {
