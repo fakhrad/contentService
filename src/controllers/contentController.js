@@ -44,6 +44,7 @@ var filter = function(req, cb) {
   };
   if (req.body.name)
     flt["fields.name"] = { $regex: ".*" + req.body.name + ".*" };
+  if (req.body.fields) flt["fields"] = req.body.fields;
   if (!req.body.contentType) delete flt.contentType;
   if (!req.body.status) delete flt.status;
   console.log(flt);
