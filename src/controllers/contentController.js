@@ -10,7 +10,7 @@ var contentUnPublished = require("../events/contents/OnContentUnPublished");
 var contentUpdated = require("../events/contents/OnContentUpdated");
 var contentSubmitted = require("../events/contents/OnContentSubmitted");
 
-var newfilter = function(req, res, next) {
+var newfilter = function (req, res, next) {
   if (!req.body.contentType) throw new Error("Invalid contentType");
   console.log(req.query);
   Contents.find(req.query)
@@ -23,7 +23,7 @@ var newfilter = function(req, res, next) {
       res.send({ success: true, error: undefined, data: cts });
     });
 };
-var filter = function(req, cb) {
+var filter = function (req, cb) {
   var skip = req.query ? req.query.skip || 0 : 0;
   var limit = req.query ? req.query.limit || 10000 : 10000;
   var sort = req.query ? req.query.sort || "-sys.issueDate" : "-sys.issueDate";
@@ -54,7 +54,7 @@ var filter = function(req, cb) {
     .skip(skip)
     .limit(limit)
     .sort(sort)
-    .exec(function(err, contents) {
+    .exec(function (err, contents) {
       var result = { success: false, data: null, error: null };
       if (err) {
         result.success = false;
@@ -77,7 +77,7 @@ var filter = function(req, cb) {
     });
 };
 
-var loadContents = function(req, cb) {
+var loadContents = function (req, cb) {
   var skip = req.query ? req.query.skip || 0 : 0;
   var limit = req.query ? req.query.limit || 10000 : 10000;
   var sort = req.query ? req.query.sort || "-sys.issueDate" : "-sys.issueDate";
@@ -92,7 +92,7 @@ var loadContents = function(req, cb) {
     .skip(skip)
     .limit(limit)
     .sort(sort)
-    .exec(function(err, contents) {
+    .exec(function (err, contents) {
       var result = { success: false, data: null, error: null };
       if (err) {
         result.success = false;
@@ -115,7 +115,7 @@ var loadContents = function(req, cb) {
     });
 };
 
-var findAll = function(req, cb) {
+var findAll = function (req, cb) {
   var skip = req.query ? req.query.skip || 0 : 0;
   var limit = req.query ? req.query.limit || 10000 : 10000;
   var sort = req.query ? req.query.sort || "-sys.issueDate" : "-sys.issueDate";
@@ -130,7 +130,7 @@ var findAll = function(req, cb) {
     .skip(skip)
     .limit(limit)
     .sort(sort)
-    .exec(function(err, contents) {
+    .exec(function (err, contents) {
       var result = { success: false, data: null, error: null };
       if (err) {
         result.success = false;
@@ -152,10 +152,10 @@ var findAll = function(req, cb) {
       }
     });
 };
-var findById = function(req, cb) {
+var findById = function (req, cb) {
   Contents.findById(req.body.id)
     .populate("contentType")
-    .exec(function(err, content) {
+    .exec(function (err, content) {
       var result = { success: false, data: null, error: null };
       if (err) {
         result.success = false;
@@ -178,11 +178,11 @@ var findById = function(req, cb) {
     });
 };
 
-var findByLink = function(req, cb) {
+var findByLink = function (req, cb) {
   console.log(req);
   Contents.findOne({ "sys.link": req.body.link })
     .populate("contentType")
-    .exec(function(err, content) {
+    .exec(function (err, content) {
       var result = { success: false, data: null, error: null };
       if (err) {
         result.success = false;
@@ -210,7 +210,7 @@ function isArray(obj) {
   return Object.prototype.toString.call(obj) === "[object Array]";
 }
 
-var checkGeneralFieldValidation = function(field, value, errors) {
+var checkGeneralFieldValidation = function (field, value, errors) {
   if (
     field.isRequired &&
     (value == undefined || value == null || value == "undefined")
@@ -225,7 +225,7 @@ var checkGeneralFieldValidation = function(field, value, errors) {
   return true;
 };
 
-var checkStringFieldValidation = function(field, value, errors) {
+var checkStringFieldValidation = function (field, value, errors) {
   if (
     field.isRequired &&
     (value == undefined ||
@@ -242,7 +242,7 @@ var checkStringFieldValidation = function(field, value, errors) {
   }
   return true;
 };
-var addContent = function(req, cb) {
+var addContent = function (req, cb) {
   try {
     console.log(JSON.stringify(req));
     ContentTypes.findById(req.body.contentType).exec((err, ctype) => {
@@ -262,10 +262,10 @@ var addContent = function(req, cb) {
         return;
       }
       var body = {};
+      var errors = [];
       for (i = 0; i < ctype.fields.length; i++) {
         var field = ctype.fields[i];
         var value = req.body.fields[field.name];
-        var errors = [];
 
         switch (field.type) {
           case "string":
@@ -287,26 +287,28 @@ var addContent = function(req, cb) {
         sys: {},
         fields: {},
         contentType: req.body.contentType,
-        status: "published",
+        status: "draft",
         statusLog: []
       });
 
       var newStatus = {};
-      newStatus.code = "published";
+      newStatus.code = "draft";
       newStatus.applyDate = new Date();
       newStatus.user = req.userId;
       newStatus.description = "Item created";
-      content.status = "published";
+      content.status = "draft";
       content.statusLog.push(newStatus);
 
       content.sys.type = "content";
       content.sys.link = uniqid();
       content.sys.spaceId = req.spaceId;
       content.sys.issuer = req.userId;
+      content.sys.lastUpdater = req.userId;
       content.sys.issueDate = new Date();
+      content.sys.lastUpdateTime = new Date();
       if (body) content.fields = body;
       var sendMail = false;
-      content.save(function(err) {
+      content.save(function (err) {
         var result = { success: false, data: null, error: null };
         if (err) {
           result.success = false;
@@ -330,7 +332,7 @@ var addContent = function(req, cb) {
   }
 };
 
-var submit = function(req, cb) {
+var submit = function (req, cb) {
   console.log("submit content started");
   addContent(req, data => {
     //Publish content submitted event
@@ -340,8 +342,8 @@ var submit = function(req, cb) {
   });
 };
 
-var deleteContent = function(req, cb) {
-  Contents.findById(req.body.id).exec(function(err, content) {
+var deleteContent = function (req, cb) {
+  Contents.findById(req.body.id).exec(function (err, content) {
     var result = { success: false, data: null, error: null };
     if (err) {
       result.success = false;
@@ -351,7 +353,7 @@ var deleteContent = function(req, cb) {
       return;
     }
     if (content) {
-      Contents.remove({ _id: content._id }, function(err) {
+      Contents.remove({ _id: content._id }, function (err) {
         if (err) {
           result.success = false;
           result.data = undefined;
@@ -361,7 +363,7 @@ var deleteContent = function(req, cb) {
         }
         //Successfull.
         //Publish user account deleted event
-        contentRemoved.OnContentRemoved.call(content);
+        contentRemoved.OnContentRemoved().call(content);
         result.success = true;
         result.data = { message: "Deleted successfully" };
         result.error = undefined;
@@ -379,8 +381,8 @@ var deleteContent = function(req, cb) {
   });
 };
 
-var deleteContentByFilter = function(req, cb) {
-  Contents.deleteMany(req.body).exec(function(err) {
+var deleteContentByFilter = function (req, cb) {
+  Contents.deleteMany(req.body).exec(function (err) {
     var result = { success: false, data: null, error: null };
     if (err) {
       result.success = false;
@@ -397,7 +399,7 @@ var deleteContentByFilter = function(req, cb) {
     }
   });
 };
-var updateContent = function(req, cb) {
+var updateContent = function (req, cb) {
   if (!req.body) {
     var result = { success: false, data: null, error: null };
     if (err) {
@@ -408,7 +410,7 @@ var updateContent = function(req, cb) {
       return;
     }
   }
-  Contents.findById(req.body.id).exec(function(err, content) {
+  Contents.findById(req.body.id).exec(function (err, content) {
     var result = { success: false, data: null, error: null };
     if (err) {
       result.success = false;
@@ -439,7 +441,7 @@ var updateContent = function(req, cb) {
       if (req.body.contentType) content.contentType = req.body.contentType;
       content.sys.lastUpdateTime = new Date();
       content.requestId = req.body.requestId;
-      content.save(function(err) {
+      content.save(function (err) {
         if (err) {
           result.success = false;
           result.data = undefined;
@@ -449,8 +451,8 @@ var updateContent = function(req, cb) {
         }
         //Successfull.
         //Publish user profile updated event
-        contentUpdated.OnContentUpdated.call(content);
-        Contents.findById(req.body.id).exec(function(err, content) {
+        contentUpdated.OnContentUpdated().call(content);
+        Contents.findById(req.body.id).exec(function (err, content) {
           if (err) {
             result.success = false;
             result.data = undefined;
@@ -476,7 +478,7 @@ var updateContent = function(req, cb) {
   });
 };
 
-var partialUpdateContent = function(req, cb) {
+var partialUpdateContent = function (req, cb) {
   if (!req.body) {
     var result = { success: false, data: null, error: null };
     if (err) {
@@ -487,7 +489,7 @@ var partialUpdateContent = function(req, cb) {
       return;
     }
   }
-  Contents.findById(req.body.id).exec(function(err, content) {
+  Contents.findById(req.body.id).exec(function (err, content) {
     var result = { success: false, data: null, error: null };
     if (err) {
       result.success = false;
@@ -509,7 +511,7 @@ var partialUpdateContent = function(req, cb) {
       if (req.body.contentType) content.contentType = req.body.contentType;
       content.sys.lastUpdateTime = new Date();
       content.requestId = req.body.requestId;
-      content.save(function(err) {
+      content.save(function (err) {
         if (err) {
           result.success = false;
           result.data = undefined;
@@ -519,8 +521,8 @@ var partialUpdateContent = function(req, cb) {
         }
         //Successfull.
         //Publish user profile updated event
-        contentUpdated.OnContentUpdated.call(content);
-        Contents.findById(req.body.id).exec(function(err, content) {
+        contentUpdated.OnContentUpdated().call(content);
+        Contents.findById(req.body.id).exec(function (err, content) {
           if (err) {
             result.success = false;
             result.data = undefined;
@@ -545,8 +547,8 @@ var partialUpdateContent = function(req, cb) {
     }
   });
 };
-var publishContent = function(req, cb) {
-  Contents.findById(req.body.id).exec(function(err, content) {
+var publishContent = function (req, cb) {
+  Contents.findById(req.body.id).exec(function (err, content) {
     var result = { success: false, data: null, error: null };
     if (err) {
       result.success = false;
@@ -556,8 +558,9 @@ var publishContent = function(req, cb) {
       return;
     }
     if (content) {
+      var last = content.status;
       console.log(req);
-      content.publish(req.body.userId, req.body.description, function(err) {
+      content.publish(req.body.userId, req.body.description, function (err) {
         if (err) {
           result.success = false;
           result.data = undefined;
@@ -565,7 +568,8 @@ var publishContent = function(req, cb) {
           cb(result);
           return;
         } else {
-          contentPublised.OnContentPublished.call(content);
+          if (last === "draft")
+            contentPublised.OnContentPublished().call(content);
           result.success = true;
           result.data = content;
           result.error = undefined;
@@ -583,8 +587,8 @@ var publishContent = function(req, cb) {
     }
   });
 };
-var unPublishContent = function(req, cb) {
-  Contents.findById(req.body.id).exec(function(err, content) {
+var unPublishContent = function (req, cb) {
+  Contents.findById(req.body.id).exec(function (err, content) {
     var result = { success: false, data: null, error: null };
     if (err) {
       result.success = false;
@@ -594,7 +598,7 @@ var unPublishContent = function(req, cb) {
       return;
     }
     if (content) {
-      content.unPublish(function(err) {
+      content.unPublish(function (err) {
         if (err) {
           result.success = false;
           result.data = undefined;
@@ -602,7 +606,7 @@ var unPublishContent = function(req, cb) {
           cb(result);
           return;
         } else {
-          contentUnPublished.OnContentUnPublished.call(content);
+          contentUnPublished.OnContentUnPublished().call(content);
           result.success = true;
           result.data = content;
           result.error = undefined;
@@ -620,8 +624,8 @@ var unPublishContent = function(req, cb) {
     }
   });
 };
-var archiveContent = function(req, cb) {
-  Contents.findById(req.body.id).exec(function(err, content) {
+var archiveContent = function (req, cb) {
+  Contents.findById(req.body.id).exec(function (err, content) {
     var result = { success: false, data: null, error: null };
     if (err) {
       result.success = false;
@@ -631,7 +635,7 @@ var archiveContent = function(req, cb) {
       return;
     }
     if (content) {
-      content.archive(req.userId, req.body.description, function(err) {
+      content.archive(req.userId, req.body.description, function (err) {
         if (err) {
           result.success = false;
           result.data = undefined;
@@ -639,7 +643,7 @@ var archiveContent = function(req, cb) {
           cb(result);
           return;
         } else {
-          contentArchived.OnContentArchived.call(content);
+          contentArchived.OnContentArchived().call(content);
           result.success = true;
           result.data = content;
           result.error = undefined;
@@ -657,8 +661,8 @@ var archiveContent = function(req, cb) {
     }
   });
 };
-var unArchiveContent = function(req, cb) {
-  Contents.findById(req.body.id).exec(function(err, content) {
+var unArchiveContent = function (req, cb) {
+  Contents.findById(req.body.id).exec(function (err, content) {
     var result = { success: false, data: null, error: null };
     if (err) {
       result.success = false;
@@ -668,7 +672,7 @@ var unArchiveContent = function(req, cb) {
       return;
     }
     if (content) {
-      content.unArchive(function(err) {
+      content.unArchive(function (err) {
         if (err) {
           result.success = false;
           result.data = undefined;
@@ -676,7 +680,7 @@ var unArchiveContent = function(req, cb) {
           cb(result);
           return;
         } else {
-          contentUnArchived.OnContentUnArchived.call(content);
+          contentUnArchived.OnContentUnArchived().call(content);
           result.success = true;
           result.data = content;
           result.error = undefined;
@@ -695,7 +699,7 @@ var unArchiveContent = function(req, cb) {
   });
 };
 
-exports.query = function(req, cb) {
+exports.query = function (req, cb) {
   console.log(req.body);
   var skip = parseInt(req.body.skip) || 0;
   delete req.body.skip;
