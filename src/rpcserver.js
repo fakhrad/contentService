@@ -11,6 +11,7 @@ var rabbitHost = process.env.RABBITMQ_HOST || "amqp://gvgeetrh:6SyWQAxDCpcdg1S0D
 //var rabbitHost = process.env.RABBITMQ_HOST || "amqp://localhost:5672";
 
 var amqpConn = null;
+
 function start() {
   console.log('Start connecting : ' + process.env.RABBITMQ_HOST);;
   amqp.connect(rabbitHost, (err, conn) => {
@@ -34,6 +35,7 @@ function start() {
     whenConnected();
   });
 }
+
 function whenConnected() {
   amqpConn.createChannel((err, ch) => {
     if (err) {
@@ -54,554 +56,782 @@ function whenConnected() {
     ch.prefetch(1);
     console.log('Content service broker started!');
     //Login API
-    ch.assertQueue("getcontents", { durable: false }, (err, q) => {
+    ch.assertQueue("getcontents", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           contentController.getAll(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
-    ch.assertQueue("addcontenttype", { durable: false }, (err, q) => {
+
+    ch.assertQueue("getcontenttypescount", {
+      durable: false
+    }, (err, q) => {
+      ch.consume(q.queue, function reply(msg) {
+        var req = JSON.parse(msg.content.toString('utf8'));
+        try {
+          ctypeController.count(req, (result) => {
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
+            ch.ack(msg);
+          });
+        } catch (ex) {
+          console.log(ex);
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
+          ch.ack(msg);
+        }
+
+      });
+    });
+
+    ch.assertQueue("addcontenttype", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           ctypeController.addContentTypes(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
-    ch.assertQueue("updatecontenttype", { durable: false }, (err, q) => {
+    ch.assertQueue("updatecontenttype", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           ctypeController.updateContentType(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
-    ch.assertQueue("removecontenttype", { durable: false }, (err, q) => {
+    ch.assertQueue("removecontenttype", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           ctypeController.deleteContentTypes(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
 
-    ch.assertQueue("getcontenttemplates", { durable: false }, (err, q) => {
+    ch.assertQueue("getcontenttemplates", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           ctypeController.getContentTemplates(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
-    ch.assertQueue("getcontenttypes", { durable: false }, (err, q) => {
+    ch.assertQueue("getcontenttypes", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           ctypeController.getContentTypes(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
 
-    ch.assertQueue("getcontenttypesbyid", { durable: false }, (err, q) => {
+    ch.assertQueue("getcontenttypesbyid", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           ctypeController.findbyid(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
 
-    ch.assertQueue("addasset", { durable: false }, (err, q) => {
+    ch.assertQueue("addasset", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           assetController.add(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
-    ch.assertQueue("updateasset", { durable: false }, (err, q) => {
+    ch.assertQueue("updateasset", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           assetController.update(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
-    ch.assertQueue("removeasset", { durable: false }, (err, q) => {
+    ch.assertQueue("removeasset", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           assetController.remove(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
-    ch.assertQueue("getallassets", { durable: false }, (err, q) => {
+    ch.assertQueue("getallassets", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           assetController.getAll(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
 
-    ch.assertQueue("filterassets", { durable: false }, (err, q) => {
+    ch.assertQueue("filterassets", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           assetController.filter(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
 
-    ch.assertQueue("getassetbyid", { durable: false }, (err, q) => {
+    ch.assertQueue("getassetbyid", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           assetController.findById(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
-    ch.assertQueue("publishasset", { durable: false }, (err, q) => {
+    ch.assertQueue("publishasset", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           assetController.publish(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
-    ch.assertQueue("unpublishasset", { durable: false }, (err, q) => {
+    ch.assertQueue("unpublishasset", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           assetController.unPublish(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
-    ch.assertQueue("archiveasset", { durable: false }, (err, q) => {
+    ch.assertQueue("archiveasset", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           assetController.archive(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
-    ch.assertQueue("unarchiveasset", { durable: false }, (err, q) => {
+    ch.assertQueue("unarchiveasset", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           assetController.unArchive(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
 
+    ch.assertQueue("getassetscount", {
+      durable: false
+    }, (err, q) => {
+      ch.consume(q.queue, function reply(msg) {
+        var req = JSON.parse(msg.content.toString('utf8'));
+        try {
+          assetController.count(req, (result) => {
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
+            ch.ack(msg);
+          });
+        } catch (ex) {
+          console.log(ex);
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
+          ch.ack(msg);
+        }
+
+      });
+    });
     //Contents Api
 
-    ch.assertQueue("querycontents", { durable: false }, (err, q) => {
+    ch.assertQueue("getcontentscount", {
+      durable: false
+    }, (err, q) => {
+      ch.consume(q.queue, function reply(msg) {
+        var req = JSON.parse(msg.content.toString('utf8'));
+        try {
+          contentController.count(req, (result) => {
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
+            ch.ack(msg);
+          });
+        } catch (ex) {
+          console.log(ex);
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
+          ch.ack(msg);
+        }
+
+      });
+    });
+    ch.assertQueue("querycontents", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           contentController.query(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
-    ch.assertQueue("filtercontents", { durable: false }, (err, q) => {
+    ch.assertQueue("filtercontents", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           contentController.filter(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
-    ch.assertQueue("getcontentbyid", { durable: false }, (err, q) => {
+    ch.assertQueue("getcontentbyid", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           contentController.findById(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
-    ch.assertQueue("getcontentbylink", { durable: false }, (err, q) => {
+    ch.assertQueue("getcontentbylink", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           contentController.findByLink(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
-    ch.assertQueue("addcontent", { durable: false }, (err, q) => {
+    ch.assertQueue("addcontent", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           contentController.add(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
-    ch.assertQueue("updatecontent", { durable: false }, (err, q) => {
+    ch.assertQueue("updatecontent", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           contentController.update(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
-    ch.assertQueue("partialupdatecontent", { durable: false }, (err, q) => {
+    ch.assertQueue("partialupdatecontent", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           contentController.partialupdate(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
-    ch.assertQueue("removecontent", { durable: false }, (err, q) => {
+    ch.assertQueue("removecontent", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           contentController.delete(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
-    ch.assertQueue("removecontentbyfilter", { durable: false }, (err, q) => {
+    ch.assertQueue("removecontentbyfilter", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           contentController.deleteMany(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
-    ch.assertQueue("getallcontents", { durable: false }, (err, q) => {
+    ch.assertQueue("getallcontents", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           contentController.getAll(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
-    ch.assertQueue("publishcontent", { durable: false }, (err, q) => {
+    ch.assertQueue("publishcontent", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           contentController.publish(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
-    ch.assertQueue("unpublishcontent", { durable: false }, (err, q) => {
+    ch.assertQueue("unpublishcontent", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           contentController.unPublish(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
-    ch.assertQueue("archivecontent", { durable: false }, (err, q) => {
+    ch.assertQueue("archivecontent", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           contentController.archive(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
-    ch.assertQueue("unarchivecontent", { durable: false }, (err, q) => {
+    ch.assertQueue("unarchivecontent", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           contentController.unArchive(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
       });
     });
 
-    ch.assertQueue("submitcontent", { durable: false }, (err, q) => {
+    ch.assertQueue("submitcontent", {
+      durable: false
+    }, (err, q) => {
       ch.consume(q.queue, function reply(msg) {
         var req = JSON.parse(msg.content.toString('utf8'));
         try {
           contentController.submit(req, (result) => {
-            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), { correlationId: msg.properties.correlationId });
+            ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(result)), {
+              correlationId: msg.properties.correlationId
+            });
             ch.ack(msg);
           });
-        }
-        catch (ex) {
+        } catch (ex) {
           console.log(ex);
-          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), { correlationId: msg.properties.correlationId });
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
           ch.ack(msg);
         }
 
@@ -819,7 +1049,10 @@ function whenConnected() {
       durable: false
     });
 
-    ch.assertQueue("", { durable: false, exclusive: true }, (err, q) => {
+    ch.assertQueue("", {
+      durable: false,
+      exclusive: true
+    }, (err, q) => {
       if (!err) {
         ch.bindQueue(q.queue, "adminauth", "adminuserregistered")
         ch.consume(q.queue, function (msg) {
@@ -828,22 +1061,28 @@ function whenConnected() {
           console.log("Admin user registered. creating space");
           try {
             async.parallel({
-              "space": function (callback) { spaceController.createuserspace(req, callback) },
-              "adminuser": function (callback) { adminController.registeruser(req, callback) },
+              "space": function (callback) {
+                spaceController.createuserspace(req, callback)
+              },
+              "adminuser": function (callback) {
+                adminController.registeruser(req, callback)
+              },
             }, (err, results) => {
 
             });
-          }
-          catch (ex) {
+          } catch (ex) {
             console.log(ex);
           }
         }, {
-            noAck: true
-          });
+          noAck: true
+        });
       }
     });
 
-    ch.assertQueue("", { durable: false, exclusive: true }, (err, q) => {
+    ch.assertQueue("", {
+      durable: false,
+      exclusive: true
+    }, (err, q) => {
       if (!err) {
         ch.bindQueue(q.queue, "adminauth", "adminuserloggedout")
         ch.consume(q.queue, function (msg) {
@@ -851,17 +1090,19 @@ function whenConnected() {
           var req = JSON.parse(msg.content.toString('utf8'));
           console.log("Admin user logged out. deleting tokens");
           try {
-            adminController.logout(req, () => { });
-          }
-          catch (ex) {
+            adminController.logout(req, () => {});
+          } catch (ex) {
             console.log(ex);
           }
         }, {
-            noAck: true
-          });
+          noAck: true
+        });
       }
     });
-    ch.assertQueue("", { durable: false, exclusive: true }, (err, q) => {
+    ch.assertQueue("", {
+      durable: false,
+      exclusive: true
+    }, (err, q) => {
       if (!err) {
         ch.bindQueue(q.queue, "adminauth", "admintokencreated")
         ch.consume(q.queue, function (msg) {
@@ -869,14 +1110,13 @@ function whenConnected() {
           var req = JSON.parse(msg.content.toString('utf8'));
           console.log("Admin user token created. adding tokens");
           try {
-            adminController.savetoken(req, () => { });
-          }
-          catch (ex) {
+            adminController.savetoken(req, () => {});
+          } catch (ex) {
             console.log(ex);
           }
         }, {
-            noAck: true
-          });
+          noAck: true
+        });
       }
     });
   });
@@ -888,6 +1128,8 @@ start();
 db();
 exports.publish = function (exchange, queue, message) {
   console.log(message);
-  channel.publish(exchange, queue, Buffer.from(JSON.stringify({ body: message })));
+  channel.publish(exchange, queue, Buffer.from(JSON.stringify({
+    body: message
+  })));
   console.log('publishing message to : ' + exchange + " : " + queue);
 }

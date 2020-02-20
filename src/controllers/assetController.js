@@ -2,9 +2,13 @@ const Assets = require("../models/asset");
 const Status = require("../models/status");
 var uniqid = require("uniqid");
 
-var findAll = function(req, cb) {
+var findAll = function (req, cb) {
   if (!req.spaceId) {
-    var result = { success: false, data: null, error: null };
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
     if (err) {
       result.success = false;
       result.data = undefined;
@@ -21,13 +25,19 @@ var findAll = function(req, cb) {
     delete req.query.limit;
     delete req.query.sort;
   }
-  Assets.find({ "sys.spaceId": req.spaceId })
+  Assets.find({
+      "sys.spaceId": req.spaceId
+    })
     .skip(skip)
     .limit(limit)
     .sort(sort)
-    .exec(function(err, assets) {
+    .exec(function (err, assets) {
       console.log(assets);
-      var result = { success: false, data: null, error: null };
+      var result = {
+        success: false,
+        data: null,
+        error: null
+      };
       if (err) {
         result.success = false;
         result.data = undefined;
@@ -49,7 +59,7 @@ var findAll = function(req, cb) {
     });
 };
 
-var filter = function(req, cb) {
+var filter = function (req, cb) {
   var skip = req.query ? req.query.skip || 0 : 0;
   var limit = req.query ? req.query.limit || 10000 : 10000;
   var sort = req.query ? req.query.sort || "-sys.issueDate" : "-sys.issueDate";
@@ -64,8 +74,12 @@ var filter = function(req, cb) {
   if (req.body.status) st = req.body.status.split(",");
   var flt = {
     "sys.spaceId": req.spaceId,
-    fileType: { $in: ft },
-    status: { $in: st }
+    fileType: {
+      $in: ft
+    },
+    status: {
+      $in: st
+    }
   };
   if (!req.body.fileType) delete flt.fileType;
   if (!req.body.status) delete flt.status;
@@ -74,8 +88,12 @@ var filter = function(req, cb) {
     .skip(skip)
     .limit(limit)
     .sort(sort)
-    .exec(function(err, Assets) {
-      var result = { success: false, data: null, error: null };
+    .exec(function (err, Assets) {
+      var result = {
+        success: false,
+        data: null,
+        error: null
+      };
       if (err) {
         result.success = false;
         result.data = undefined;
@@ -97,9 +115,13 @@ var filter = function(req, cb) {
     });
 };
 
-var findById = function(req, cb) {
-  Assets.findById(req.body.id).exec(function(err, asset) {
-    var result = { success: false, data: null, error: null };
+var findById = function (req, cb) {
+  Assets.findById(req.body.id).exec(function (err, asset) {
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
     if (err) {
       result.success = false;
       result.data = undefined;
@@ -121,7 +143,7 @@ var findById = function(req, cb) {
   });
 };
 
-var addAsset = function(req, cb) {
+var addAsset = function (req, cb) {
   var asset = new Assets({
     sys: {},
     name: req.body.name,
@@ -146,8 +168,12 @@ var addAsset = function(req, cb) {
   asset.sys.issueDate = new Date();
   asset.sys.spaceId = req.spaceId;
 
-  asset.save(function(err) {
-    var result = { success: false, data: null, error: null };
+  asset.save(function (err) {
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
     if (err) {
       result.success = false;
       result.data = undefined;
@@ -164,9 +190,13 @@ var addAsset = function(req, cb) {
   });
 };
 
-var deleteAsset = function(req, cb) {
-  Assets.findById(req.body.id).exec(function(err, asset) {
-    var result = { success: false, data: null, error: null };
+var deleteAsset = function (req, cb) {
+  Assets.findById(req.body.id).exec(function (err, asset) {
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
     if (err) {
       result.success = false;
       result.data = undefined;
@@ -175,7 +205,9 @@ var deleteAsset = function(req, cb) {
       return;
     }
     if (asset) {
-      Assets.remove({ _id: asset._id }, function(err) {
+      Assets.remove({
+        _id: asset._id
+      }, function (err) {
         if (err) {
           result.success = false;
           result.data = undefined;
@@ -186,7 +218,9 @@ var deleteAsset = function(req, cb) {
         //Successfull.
         //Publish user account deleted event
         result.success = true;
-        result.data = { message: "Deleted successfully" };
+        result.data = {
+          message: "Deleted successfully"
+        };
         result.error = undefined;
         cb(result);
         return;
@@ -202,10 +236,14 @@ var deleteAsset = function(req, cb) {
   });
 };
 
-var updateAsset = function(req, cb) {
+var updateAsset = function (req, cb) {
   console.log("asset update started");
-  Assets.findById(req.body.id).exec(function(err, asset) {
-    var result = { success: false, data: null, error: null };
+  Assets.findById(req.body.id).exec(function (err, asset) {
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
     if (err) {
       result.success = false;
       result.data = undefined;
@@ -216,8 +254,8 @@ var updateAsset = function(req, cb) {
     if (asset) {
       (asset.name = req.body.name), (asset.title = req.body.title);
       (asset.fileType = req.body.fileType),
-        (asset.description = req.body.description),
-        (asset.url = req.body.url);
+      (asset.description = req.body.description),
+      (asset.url = req.body.url);
 
       if (asset.status != "draft") {
         var newStatus = {};
@@ -232,7 +270,7 @@ var updateAsset = function(req, cb) {
       asset.sys.lastUpdateTime = new Date();
       console.log(req);
 
-      asset.save(function(err) {
+      asset.save(function (err) {
         if (err) {
           result.success = false;
           result.data = undefined;
@@ -257,9 +295,13 @@ var updateAsset = function(req, cb) {
   });
 };
 
-var publishAsset = function(req, cb) {
-  Assets.findById(req.body.id).exec(function(err, asset) {
-    var result = { success: false, data: null, error: null };
+var publishAsset = function (req, cb) {
+  Assets.findById(req.body.id).exec(function (err, asset) {
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
     if (err) {
       result.success = false;
       result.data = undefined;
@@ -269,7 +311,7 @@ var publishAsset = function(req, cb) {
     }
     if (asset) {
       console.log(req);
-      asset.publish(req.body.userId, req.body.description, function(err) {
+      asset.publish(req.body.userId, req.body.description, function (err) {
         if (err) {
           result.success = false;
           result.data = undefined;
@@ -294,9 +336,13 @@ var publishAsset = function(req, cb) {
     }
   });
 };
-var unPublishAsset = function(req, cb) {
-  Assets.findById(req.body.id).exec(function(err, asset) {
-    var result = { success: false, data: null, error: null };
+var unPublishAsset = function (req, cb) {
+  Assets.findById(req.body.id).exec(function (err, asset) {
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
     if (err) {
       result.success = false;
       result.data = undefined;
@@ -305,7 +351,7 @@ var unPublishAsset = function(req, cb) {
       return;
     }
     if (asset) {
-      asset.unPublish(function(err) {
+      asset.unPublish(function (err) {
         if (err) {
           result.success = false;
           result.data = undefined;
@@ -330,9 +376,13 @@ var unPublishAsset = function(req, cb) {
     }
   });
 };
-var archiveAsset = function(req, cb) {
-  Assets.findById(req.body.id).exec(function(err, asset) {
-    var result = { success: false, data: null, error: null };
+var archiveAsset = function (req, cb) {
+  Assets.findById(req.body.id).exec(function (err, asset) {
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
     if (err) {
       result.success = false;
       result.data = undefined;
@@ -341,7 +391,7 @@ var archiveAsset = function(req, cb) {
       return;
     }
     if (asset) {
-      asset.archive(req.userId, req.body.description, function(err) {
+      asset.archive(req.userId, req.body.description, function (err) {
         if (err) {
           result.success = false;
           result.data = undefined;
@@ -366,9 +416,13 @@ var archiveAsset = function(req, cb) {
     }
   });
 };
-var unArchiveAsset = function(req, cb) {
-  Assets.findById(req.body.id).exec(function(err, asset) {
-    var result = { success: false, data: null, error: null };
+var unArchiveAsset = function (req, cb) {
+  Assets.findById(req.body.id).exec(function (err, asset) {
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
     if (err) {
       result.success = false;
       result.data = undefined;
@@ -377,7 +431,7 @@ var unArchiveAsset = function(req, cb) {
       return;
     }
     if (asset) {
-      asset.unArchive(function(err) {
+      asset.unArchive(function (err) {
         if (err) {
           result.success = false;
           result.data = undefined;
@@ -401,6 +455,32 @@ var unArchiveAsset = function(req, cb) {
       return;
     }
   });
+};
+
+var countAll = function (req, cb) {
+  Assets.where({
+      "sys.spaceId": req.spaceId
+    })
+    .countDocuments(function (err, contentTypes) {
+      var result = {
+        success: false,
+        data: null,
+        error: null
+      };
+      if (err) {
+        result.success = false;
+        result.data = undefined;
+        result.error = err;
+        cb(result);
+        return;
+      }
+      result.success = true;
+      result.error = undefined;
+      result.data = {
+        count: contentTypes
+      };
+      cb(result);
+    });
 };
 exports.getAll = findAll;
 exports.findById = findById;
@@ -412,3 +492,4 @@ exports.unPublish = unPublishAsset;
 exports.archive = archiveAsset;
 exports.unArchive = unArchiveAsset;
 exports.filter = filter;
+exports.count = countAll;

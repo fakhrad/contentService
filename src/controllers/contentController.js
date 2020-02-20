@@ -17,10 +17,17 @@ var newfilter = function (req, res, next) {
     .select("fields sys.issuer, sys.issueDate _id, status")
     .exec((err, cts) => {
       if (err) {
-        res.status(500).send({ success: false, error: err });
+        res.status(500).send({
+          success: false,
+          error: err
+        });
         return;
       }
-      res.send({ success: true, error: undefined, data: cts });
+      res.send({
+        success: true,
+        error: undefined,
+        data: cts
+      });
     });
 };
 var filter = function (req, cb) {
@@ -39,11 +46,17 @@ var filter = function (req, cb) {
   if (req.body.status) st = req.body.status.split(",");
   var flt = {
     "sys.spaceId": req.spaceId,
-    contentType: { $in: ct },
-    status: { $in: st }
+    contentType: {
+      $in: ct
+    },
+    status: {
+      $in: st
+    }
   };
   if (req.body.name)
-    flt["fields.name"] = { $regex: ".*" + req.body.name + ".*" };
+    flt["fields.name"] = {
+      $regex: ".*" + req.body.name + ".*"
+    };
   if (req.body.fields) flt["fields"] = req.body.fields;
   if (!req.body.contentType) delete flt.contentType;
   if (!req.body.status) delete flt.status;
@@ -55,7 +68,11 @@ var filter = function (req, cb) {
     .limit(limit)
     .sort(sort)
     .exec(function (err, contents) {
-      var result = { success: false, data: null, error: null };
+      var result = {
+        success: false,
+        data: null,
+        error: null
+      };
       if (err) {
         result.success = false;
         result.data = undefined;
@@ -86,14 +103,20 @@ var loadContents = function (req, cb) {
     delete req.query.limit;
     delete req.query.sort;
   }
-  Contents.find({ "sys.spaceId": req.spaceId })
+  Contents.find({
+      "sys.spaceId": req.spaceId
+    })
     .populate("contentType", "title media")
     .select("fields.name fields.description status sys contentType")
     .skip(skip)
     .limit(limit)
     .sort(sort)
     .exec(function (err, contents) {
-      var result = { success: false, data: null, error: null };
+      var result = {
+        success: false,
+        data: null,
+        error: null
+      };
       if (err) {
         result.success = false;
         result.data = undefined;
@@ -124,14 +147,20 @@ var findAll = function (req, cb) {
     delete req.query.limit;
     delete req.query.sort;
   }
-  Contents.find({ "sys.spaceId": req.spaceId })
+  Contents.find({
+      "sys.spaceId": req.spaceId
+    })
     .populate("contentType", "title media")
     .select("fields.name fields.description status sys contentType")
     .skip(skip)
     .limit(limit)
     .sort(sort)
     .exec(function (err, contents) {
-      var result = { success: false, data: null, error: null };
+      var result = {
+        success: false,
+        data: null,
+        error: null
+      };
       if (err) {
         result.success = false;
         result.data = undefined;
@@ -156,7 +185,11 @@ var findById = function (req, cb) {
   Contents.findById(req.body.id)
     .populate("contentType")
     .exec(function (err, content) {
-      var result = { success: false, data: null, error: null };
+      var result = {
+        success: false,
+        data: null,
+        error: null
+      };
       if (err) {
         result.success = false;
         result.data = undefined;
@@ -180,10 +213,16 @@ var findById = function (req, cb) {
 
 var findByLink = function (req, cb) {
   console.log(req);
-  Contents.findOne({ "sys.link": req.body.link })
+  Contents.findOne({
+      "sys.link": req.body.link
+    })
     .populate("contentType")
     .exec(function (err, content) {
-      var result = { success: false, data: null, error: null };
+      var result = {
+        success: false,
+        data: null,
+        error: null
+      };
       if (err) {
         result.success = false;
         result.data = undefined;
@@ -247,7 +286,10 @@ var addContent = function (req, cb) {
     console.log(JSON.stringify(req));
     ContentTypes.findById(req.body.contentType).exec((err, ctype) => {
       if (err) {
-        cb({ success: false, error: err });
+        cb({
+          success: false,
+          error: err
+        });
         return;
       }
       if (!ctype) {
@@ -258,7 +300,10 @@ var addContent = function (req, cb) {
         return;
       }
       if (!req.body || (req.body && !req.body.fields)) {
-        cb({ success: false, error: "Invalid request" });
+        cb({
+          success: false,
+          error: "Invalid request"
+        });
         return;
       }
       var body = {};
@@ -279,7 +324,11 @@ var addContent = function (req, cb) {
       }
       console.log(body);
       if (errors.length > 0) {
-        cb({ success: false, error: errors, code: 422 });
+        cb({
+          success: false,
+          error: errors,
+          code: 422
+        });
         return;
       }
       var d = req.body;
@@ -309,7 +358,11 @@ var addContent = function (req, cb) {
       if (body) content.fields = body;
       var sendMail = false;
       content.save(function (err) {
-        var result = { success: false, data: null, error: null };
+        var result = {
+          success: false,
+          data: null,
+          error: null
+        };
         if (err) {
           result.success = false;
           result.data = undefined;
@@ -344,7 +397,11 @@ var submit = function (req, cb) {
 
 var deleteContent = function (req, cb) {
   Contents.findById(req.body.id).exec(function (err, content) {
-    var result = { success: false, data: null, error: null };
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
     if (err) {
       result.success = false;
       result.data = undefined;
@@ -353,7 +410,9 @@ var deleteContent = function (req, cb) {
       return;
     }
     if (content) {
-      Contents.remove({ _id: content._id }, function (err) {
+      Contents.remove({
+        _id: content._id
+      }, function (err) {
         if (err) {
           result.success = false;
           result.data = undefined;
@@ -365,7 +424,9 @@ var deleteContent = function (req, cb) {
         //Publish user account deleted event
         contentRemoved.OnContentRemoved().call(content);
         result.success = true;
-        result.data = { message: "Deleted successfully" };
+        result.data = {
+          message: "Deleted successfully"
+        };
         result.error = undefined;
         cb(result);
         return;
@@ -383,7 +444,11 @@ var deleteContent = function (req, cb) {
 
 var deleteContentByFilter = function (req, cb) {
   Contents.deleteMany(req.body).exec(function (err) {
-    var result = { success: false, data: null, error: null };
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
     if (err) {
       result.success = false;
       result.data = undefined;
@@ -401,7 +466,11 @@ var deleteContentByFilter = function (req, cb) {
 };
 var updateContent = function (req, cb) {
   if (!req.body) {
-    var result = { success: false, data: null, error: null };
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
     if (err) {
       result.success = false;
       result.data = undefined;
@@ -411,7 +480,11 @@ var updateContent = function (req, cb) {
     }
   }
   Contents.findById(req.body.id).exec(function (err, content) {
-    var result = { success: false, data: null, error: null };
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
     if (err) {
       result.success = false;
       result.data = undefined;
@@ -480,7 +553,11 @@ var updateContent = function (req, cb) {
 
 var partialUpdateContent = function (req, cb) {
   if (!req.body) {
-    var result = { success: false, data: null, error: null };
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
     if (err) {
       result.success = false;
       result.data = undefined;
@@ -490,7 +567,11 @@ var partialUpdateContent = function (req, cb) {
     }
   }
   Contents.findById(req.body.id).exec(function (err, content) {
-    var result = { success: false, data: null, error: null };
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
     if (err) {
       result.success = false;
       result.data = undefined;
@@ -549,7 +630,11 @@ var partialUpdateContent = function (req, cb) {
 };
 var publishContent = function (req, cb) {
   Contents.findById(req.body.id).exec(function (err, content) {
-    var result = { success: false, data: null, error: null };
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
     if (err) {
       result.success = false;
       result.data = undefined;
@@ -589,7 +674,11 @@ var publishContent = function (req, cb) {
 };
 var unPublishContent = function (req, cb) {
   Contents.findById(req.body.id).exec(function (err, content) {
-    var result = { success: false, data: null, error: null };
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
     if (err) {
       result.success = false;
       result.data = undefined;
@@ -626,7 +715,11 @@ var unPublishContent = function (req, cb) {
 };
 var archiveContent = function (req, cb) {
   Contents.findById(req.body.id).exec(function (err, content) {
-    var result = { success: false, data: null, error: null };
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
     if (err) {
       result.success = false;
       result.data = undefined;
@@ -663,7 +756,11 @@ var archiveContent = function (req, cb) {
 };
 var unArchiveContent = function (req, cb) {
   Contents.findById(req.body.id).exec(function (err, content) {
-    var result = { success: false, data: null, error: null };
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
     if (err) {
       result.success = false;
       result.data = undefined;
@@ -715,7 +812,10 @@ exports.query = function (req, cb) {
     .sort(sort)
     .exec((err, cts) => {
       if (err) {
-        cb({ success: false, error: err });
+        cb({
+          success: false,
+          error: err
+        });
         return;
       }
       try {
@@ -726,7 +826,11 @@ exports.query = function (req, cb) {
         }
         var relfieldarr = {};
         var ids = [];
-        ContentTypes.find({ _id: { $in: ctypes } }).exec((err, ttypes) => {
+        ContentTypes.find({
+          _id: {
+            $in: ctypes
+          }
+        }).exec((err, ttypes) => {
           if (err) {
             cb(cts);
             return;
@@ -775,8 +879,10 @@ exports.query = function (req, cb) {
               }
             });
             Contents.find({
-              _id: { $in: ids }
-            })
+                _id: {
+                  $in: ids
+                }
+              })
               .select("fields _id")
               .exec((err, rels) => {
                 if (err) {
@@ -800,9 +906,7 @@ exports.query = function (req, cb) {
                         ) {
                           if (isArray(content.fields[fld.name])) {
                             for (
-                              i = 0;
-                              i < content.fields[fld.name].length;
-                              i++
+                              i = 0; i < content.fields[fld.name].length; i++
                             ) {
                               var item = content.fields[fld.name][i];
                               var row = rels.filter(
@@ -827,8 +931,8 @@ exports.query = function (req, cb) {
                           } else {
                             var row = rels.filter(
                               a =>
-                                a._id.toString() ===
-                                content.fields[fld.name].toString()
+                              a._id.toString() ===
+                              content.fields[fld.name].toString()
                             );
                             if (
                               row.length > 0 &&
@@ -862,6 +966,37 @@ exports.query = function (req, cb) {
       }
     });
 };
+
+var countAll = function (req, cb) {
+  var query = {
+    "sys.spaceId": req.spaceId
+  }
+  if (req.body && req.body.contentType)
+    query.contentType = req.body.contentType
+  console.log(query)
+  Contents.where(query)
+    .countDocuments(function (err, contentTypes) {
+      var result = {
+        success: false,
+        data: null,
+        error: null
+      };
+      if (err) {
+        result.success = false;
+        result.data = undefined;
+        result.error = err;
+        cb(result);
+        return;
+      }
+      result.success = true;
+      result.error = undefined;
+      result.data = {
+        count: contentTypes
+      };
+      cb(result);
+    });
+};
+
 exports.getAll = findAll;
 exports.filter = filter;
 exports.findById = findById;
@@ -877,3 +1012,4 @@ exports.publish = publishContent;
 exports.unPublish = unPublishContent;
 exports.archive = archiveContent;
 exports.unArchive = unArchiveContent;
+exports.count = countAll;

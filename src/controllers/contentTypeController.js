@@ -3,7 +3,7 @@ var Templates = require("../models/templates");
 var Space = require("../models/space");
 var uniqid = require("uniqid");
 
-var getContentTypes = function(req, cb) {
+var getContentTypes = function (req, cb) {
   var skip = req.query ? req.query.skip || 0 : 0;
   var limit = req.query ? req.query.limit || 10000 : 10000;
   var sort = req.query ? req.query.sort || "-sys.issueDate" : "-sys.issueDate";
@@ -12,12 +12,18 @@ var getContentTypes = function(req, cb) {
     delete req.query.limit;
     delete req.query.sort;
   }
-  ContentTypes.find({ "sys.spaceId": req.spaceId })
+  ContentTypes.find({
+      "sys.spaceId": req.spaceId
+    })
     .skip(skip)
     .limit(limit)
     .sort(sort)
-    .exec(function(err, contentTypes) {
-      var result = { success: false, data: null, error: null };
+    .exec(function (err, contentTypes) {
+      var result = {
+        success: false,
+        data: null,
+        error: null
+      };
       if (err) {
         result.success = false;
         result.data = undefined;
@@ -32,7 +38,7 @@ var getContentTypes = function(req, cb) {
     });
 };
 
-var getContentTemplates = function(req, cb) {
+var getContentTemplates = function (req, cb) {
   var skip = req.query ? req.query.skip || 0 : 0;
   var limit = req.query ? req.query.limit || 10000 : 10000;
   if (req.query) {
@@ -42,8 +48,12 @@ var getContentTemplates = function(req, cb) {
   Templates.find()
     .skip(skip)
     .limit(limit)
-    .exec(function(err, templates) {
-      var result = { success: false, data: null, error: null };
+    .exec(function (err, templates) {
+      var result = {
+        success: false,
+        data: null,
+        error: null
+      };
       if (err) {
         result.success = false;
         result.data = undefined;
@@ -57,9 +67,13 @@ var getContentTemplates = function(req, cb) {
       cb(result);
     });
 };
-var findById = function(req, cb) {
-  ContentTypes.findById(req.body.id).exec(function(err, contentTypes) {
-    var result = { success: false, data: null, error: null };
+var findById = function (req, cb) {
+  ContentTypes.findById(req.body.id).exec(function (err, contentTypes) {
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
     if (err) {
       result.success = false;
       result.data = undefined;
@@ -81,8 +95,12 @@ var findById = function(req, cb) {
   });
 };
 
-var addContentTypes = function(req, cb) {
-  var result = { success: false, data: null, error: null };
+var addContentTypes = function (req, cb) {
+  var result = {
+    success: false,
+    data: null,
+    error: null
+  };
   if (!req.body.name) {
     result.success = false;
     result.data = undefined;
@@ -110,7 +128,7 @@ var addContentTypes = function(req, cb) {
   cat.sys.issueDate = new Date();
   cat.sys.spaceId = req.spaceId;
   console.log(cat);
-  cat.save(function(err) {
+  cat.save(function (err) {
     if (err) {
       result.success = false;
       result.data = undefined;
@@ -143,10 +161,14 @@ var addContentTypes = function(req, cb) {
   // });
 };
 
-var updateContentType = function(req, cb) {
+var updateContentType = function (req, cb) {
   console.log(req.body);
-  ContentTypes.findById(req.body.id).exec(function(err, contentType) {
-    var result = { success: false, data: null, error: null };
+  ContentTypes.findById(req.body.id).exec(function (err, contentType) {
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
     if (err) {
       result.success = false;
       result.data = undefined;
@@ -162,10 +184,10 @@ var updateContentType = function(req, cb) {
       contentType.template = req.body.template;
       contentType.media = req.body.media;
       (contentType.allowCustomFields = req.body.allowCustomFields),
-        (contentType.accessRight = req.body.accessRight);
+      (contentType.accessRight = req.body.accessRight);
       (contentType.categorization = req.body.categorization),
-        (contentType.fields = req.body.fields);
-      contentType.save(function(err) {
+      (contentType.fields = req.body.fields);
+      contentType.save(function (err) {
         if (err) {
           result.success = false;
           result.data = undefined;
@@ -175,7 +197,7 @@ var updateContentType = function(req, cb) {
         }
         //Successfull.
         //Publish user profile updated event
-        ContentTypes.findById(req.body.id).exec(function(err, contentType) {
+        ContentTypes.findById(req.body.id).exec(function (err, contentType) {
           if (err) {
             result.success = false;
             result.data = undefined;
@@ -199,9 +221,13 @@ var updateContentType = function(req, cb) {
     }
   });
 };
-var deleteContentTypes = function(req, cb) {
-  ContentTypes.findById(req.body.id).exec(function(err, contentType) {
-    var result = { success: false, data: null, error: null };
+var deleteContentTypes = function (req, cb) {
+  ContentTypes.findById(req.body.id).exec(function (err, contentType) {
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
     if (err) {
       result.success = false;
       result.data = undefined;
@@ -210,7 +236,9 @@ var deleteContentTypes = function(req, cb) {
       return;
     }
     if (contentType) {
-      ContentTypes.remove({ _id: contentType._id }, function(err) {
+      ContentTypes.remove({
+        _id: contentType._id
+      }, function (err) {
         if (err) {
           result.success = false;
           result.data = undefined;
@@ -221,7 +249,9 @@ var deleteContentTypes = function(req, cb) {
         //Successfull.
         //Publish user account deleted event
         result.success = true;
-        result.data = { message: "Deleted successfully" };
+        result.data = {
+          message: "Deleted successfully"
+        };
         result.error = undefined;
         cb(result);
         return;
@@ -236,9 +266,36 @@ var deleteContentTypes = function(req, cb) {
     }
   });
 };
+
+var countAll = function (req, cb) {
+  ContentTypes.where({
+      "sys.spaceId": req.spaceId
+    })
+    .countDocuments(function (err, contentTypes) {
+      var result = {
+        success: false,
+        data: null,
+        error: null
+      };
+      if (err) {
+        result.success = false;
+        result.data = undefined;
+        result.error = err;
+        cb(result);
+        return;
+      }
+      result.success = true;
+      result.error = undefined;
+      result.data = {
+        count: contentTypes
+      };
+      cb(result);
+    });
+};
 exports.getContentTypes = getContentTypes;
 exports.getContentTemplates = getContentTemplates;
 exports.findbyid = findById;
 exports.addContentTypes = addContentTypes;
 exports.updateContentType = updateContentType;
 exports.deleteContentTypes = deleteContentTypes;
+exports.count = countAll;
