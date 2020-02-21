@@ -1,6 +1,7 @@
 const Contents = require("../models/content");
 const ContentTypes = require("../models/contentType");
 var uniqid = require("uniqid");
+var mongoose = require('mongoose')
 var contentCreated = require("../events/contents/OnContentCreated");
 var contentPublised = require("../events/contents/OnContentPublished");
 var contentArchived = require("../events/contents/OnContentArchived");
@@ -997,6 +998,47 @@ var countAll = function (req, cb) {
     });
 };
 
+var contentsByStatus = function (req, cb) {
+  var query = {
+    "sys.spaceId": req.spaceId
+  }
+  if (req.body && req.body.contentType)
+    query.contentType = new mongoose.Types.ObjectId(req.body.contentType)
+  console.log(query)
+  const aggregatorOpts = [{
+      $match: query
+    }, {
+      $unwind: "$status"
+    },
+    {
+      $group: {
+        _id: "$status",
+        count: {
+          $sum: 1
+        }
+      }
+    }
+  ]
+  console.log(aggregatorOpts)
+  Contents.aggregate(aggregatorOpts, function (err, contents) {
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
+    if (err) {
+      result.success = false;
+      result.data = undefined;
+      result.error = err;
+      cb(result);
+      return;
+    }
+    result.success = true;
+    result.error = undefined;
+    result.data = contents;
+    cb(result);
+  });
+};
 exports.getAll = findAll;
 exports.filter = filter;
 exports.findById = findById;
@@ -1013,3 +1055,4 @@ exports.unPublish = unPublishContent;
 exports.archive = archiveContent;
 exports.unArchive = unArchiveContent;
 exports.count = countAll;
+exports.contentsByStatus = contentsByStatus;
