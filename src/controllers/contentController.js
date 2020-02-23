@@ -992,7 +992,8 @@ var countAll = function (req, cb) {
       result.success = true;
       result.error = undefined;
       result.data = {
-        count: contentTypes
+        count: contentTypes,
+        limits: 100
       };
       cb(result);
     });
@@ -1039,6 +1040,118 @@ var contentsByStatus = function (req, cb) {
     cb(result);
   });
 };
+
+var dailyInputs = function (req, cb) {
+  var days = 30;
+  if (req.body && req.body.days) {
+    days = parseInt(req.body.days)
+  }
+  var d = new Date();
+  d.setDate(d.getDate() - days);
+  var query = {
+    "sys.spaceId": req.spaceId,
+    "sys.issueDate": {
+      "$gte": d,
+      "$lt": new Date()
+    }
+  }
+  if (req.body && req.body.contentType)
+    query.contentType = new mongoose.Types.ObjectId(req.body.contentType)
+  const aggregatorOpts = [{
+      $match: query
+    },
+    {
+      $project: {
+        "_id": 0,
+        "issueDate": {
+          "$dateToString": {
+            "format": "%Y-%m-%d",
+            "date": "$sys.issueDate"
+          }
+        }
+      }
+    },
+    {
+      $unwind: "$issueDate"
+    },
+    {
+      $group: {
+        _id: "$issueDate",
+        count: {
+          $sum: 1
+        }
+      }
+    },
+
+  ]
+  console.log(JSON.stringify(aggregatorOpts))
+  Contents.aggregate(aggregatorOpts, function (err, contents) {
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
+    if (err) {
+      result.success = false;
+      result.data = undefined;
+      result.error = err;
+      cb(result);
+      return;
+    }
+    result.success = true;
+    result.error = undefined;
+    result.data = contents;
+    cb(result);
+  });
+};
+
+var getRecentItems = function (req, cb) {
+  var query = {
+    "sys.spaceId": req.spaceId
+  }
+  var skip = req.body ? req.body.skip || 0 : 0;
+  var limit = req.body ? req.body.limit || 10 : 10;
+  var sort = req.body ? req.body.sort || "-sys.issueDate" : "-sys.issueDate";
+  if (req.body) {
+    delete req.body.skip;
+    delete req.body.limit;
+    delete req.body.sort;
+  }
+  if (req.body && req.body.contentType)
+    query.contentType = req.body.contentType
+
+  Contents.find(query)
+    .populate("contentType", "title media")
+    .select("fields.name fields.description status sys contentType")
+    .skip(parseInt(skip))
+    .limit(parseInt(limit))
+    .sort(sort)
+    .exec(function (err, contents) {
+      var result = {
+        success: false,
+        data: null,
+        error: null
+      };
+      if (err) {
+        result.success = false;
+        result.data = undefined;
+        result.error = err;
+        cb(result);
+        return;
+      }
+      if (contents) {
+        result.success = true;
+        result.error = undefined;
+        result.data = contents;
+        cb(result);
+      } else {
+        result.success = false;
+        result.data = undefined;
+        result.error = undefined;
+        cb(result);
+      }
+    });
+};
 exports.getAll = findAll;
 exports.filter = filter;
 exports.findById = findById;
@@ -1056,3 +1169,5 @@ exports.archive = archiveContent;
 exports.unArchive = unArchiveContent;
 exports.count = countAll;
 exports.contentsByStatus = contentsByStatus;
+exports.getRecentItems = getRecentItems;
+exports.dailyInputs = dailyInputs;

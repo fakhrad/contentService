@@ -477,11 +477,95 @@ var countAll = function (req, cb) {
       result.success = true;
       result.error = undefined;
       result.data = {
-        count: contentTypes
+        count: contentTypes,
+        limits: 100
       };
       cb(result);
     });
 };
+
+var assetsByType = function (req, cb) {
+  var query = {
+    "sys.spaceId": req.spaceId
+  }
+  const aggregatorOpts = [{
+      $match: query
+    }, {
+      $unwind: "$fileType"
+    },
+    {
+      $group: {
+        _id: "$fileType",
+        count: {
+          $sum: 1
+        }
+      }
+    }
+  ]
+  console.log(aggregatorOpts)
+  Assets.aggregate(aggregatorOpts, function (err, contents) {
+    var result = {
+      success: false,
+      data: null,
+      error: null
+    };
+    if (err) {
+      result.success = false;
+      result.data = undefined;
+      result.error = err;
+      cb(result);
+      return;
+    }
+    result.success = true;
+    result.error = undefined;
+    result.data = contents;
+    cb(result);
+  });
+};
+
+var getRecentItems = function (req, cb) {
+  var query = {
+    "sys.spaceId": req.spaceId
+  }
+  var skip = req.body ? req.body.skip || 0 : 0;
+  var limit = req.body ? req.body.limit || 10 : 10;
+  var sort = req.body ? req.body.sort || "-sys.issueDate" : "-sys.issueDate";
+  if (req.body) {
+    delete req.body.skip;
+    delete req.body.limit;
+    delete req.body.sort;
+  }
+  Assets.find(query)
+    .skip(parseInt(skip))
+    .limit(parseInt(limit))
+    .sort(sort)
+    .exec(function (err, assets) {
+      var result = {
+        success: false,
+        data: null,
+        error: null
+      };
+      if (err) {
+        result.success = false;
+        result.data = undefined;
+        result.error = err;
+        cb(result);
+        return;
+      }
+      if (assets) {
+        result.success = true;
+        result.error = undefined;
+        result.data = assets;
+        cb(result);
+      } else {
+        result.success = false;
+        result.data = undefined;
+        result.error = undefined;
+        cb(result);
+      }
+    });
+};
+
 exports.getAll = findAll;
 exports.findById = findById;
 exports.add = addAsset;
@@ -493,3 +577,5 @@ exports.archive = archiveAsset;
 exports.unArchive = unArchiveAsset;
 exports.filter = filter;
 exports.count = countAll;
+exports.assetsbytype = assetsByType;
+exports.getRecentItems = getRecentItems;

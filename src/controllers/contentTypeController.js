@@ -287,7 +287,8 @@ var countAll = function (req, cb) {
       result.success = true;
       result.error = undefined;
       result.data = {
-        count: contentTypes
+        count: contentTypes,
+        limits: 100
       };
       cb(result);
     });
