@@ -79,6 +79,64 @@ function whenConnected() {
       });
     });
 
+
+    ch.assertQueue("getstats", {
+      durable: false
+    }, (err, q) => {
+      ch.consume(q.queue, function reply(msg) {
+        var req = JSON.parse(msg.content.toString('utf8'));
+        console.log(req);
+        try {
+          async.parallel({
+            contentTypes: function (callback) {
+              ctypeController.count(req, (result) => {
+                if (result.success)
+                  callback(undefined, result.data)
+                else
+                  callback(result.error, undefined)
+              });
+            },
+            contents: function (callback) {
+              contentController.count(req, (result) => {
+                if (result.success)
+                  callback(undefined, result.data)
+                else
+                  callback(result.error, undefined)
+              });
+            },
+            media: function (callback) {
+              assetController.count(req, (result) => {
+                if (result.success)
+                  callback(undefined, result.data)
+                else
+                  callback(result.error, undefined)
+              });
+            }
+          }, (err, results) => {
+            if (err && err.length > 0) {
+              onsole.log(ex);
+              ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(err)), {
+                correlationId: msg.properties.correlationId
+              });
+              ch.ack(msg);
+            } else {
+              ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(results)), {
+                correlationId: msg.properties.correlationId
+              });
+              ch.ack(msg);
+            }
+          })
+
+        } catch (ex) {
+          console.log(ex);
+          ch.sendToQueue(msg.properties.replyTo, new Buffer.from(JSON.stringify(ex)), {
+            correlationId: msg.properties.correlationId
+          });
+          ch.ack(msg);
+        }
+
+      });
+    });
     ch.assertQueue("getcontenttypescount", {
       durable: false
     }, (err, q) => {
