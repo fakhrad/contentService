@@ -60,8 +60,12 @@ var findAll = function (req, cb) {
 };
 
 var filter = function (req, cb) {
-  var skip = req.query ? req.query.skip || 0 : 0;
-  var limit = req.query ? req.query.limit || 10000 : 10000;
+  var skip = req.query ? parseInt(req.query.skip) || 0 : 0;
+  if (skip == undefined)
+    skip = 0;
+  var limit = req.query ? parseInt(req.query.limit) || 10000 : 10000;
+  if (limit == undefined)
+    limit = 10000;
   var sort = req.query ? req.query.sort || "-sys.issueDate" : "-sys.issueDate";
   if (req.query) {
     delete req.query.skip;
@@ -70,8 +74,8 @@ var filter = function (req, cb) {
   }
   var st = "",
     ft = "";
-  if (req.body.fileType) ft = req.body.fileType.split(",");
-  if (req.body.status) st = req.body.status.split(",");
+  if (req.query.fileType) ft = req.query.fileType.split(",");
+  if (req.query.status) st = req.query.status.split(",");
   var flt = {
     "sys.spaceId": req.spaceId,
     fileType: {
@@ -81,8 +85,8 @@ var filter = function (req, cb) {
       $in: st
     }
   };
-  if (!req.body.fileType) delete flt.fileType;
-  if (!req.body.status) delete flt.status;
+  if (!req.query.fileType) delete flt.fileType;
+  if (!req.query.status) delete flt.status;
   console.log(flt);
   Assets.find(flt)
     .skip(skip)
@@ -478,7 +482,7 @@ var countAll = function (req, cb) {
       result.error = undefined;
       result.data = {
         count: contentTypes,
-        limits: 100
+        limits: 1000
       };
       cb(result);
     });

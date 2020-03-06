@@ -32,8 +32,8 @@ var newfilter = function (req, res, next) {
     });
 };
 var filter = function (req, cb) {
-  var skip = req.query ? req.query.skip || 0 : 0;
-  var limit = req.query ? req.query.limit || 10000 : 10000;
+  var skip = req.query ? parseInt(req.query.skip) || 0 : 0;
+  var limit = req.query ? parseInt(req.query.limit) || 10000 : 10000;
   var sort = req.query ? req.query.sort || "-sys.issueDate" : "-sys.issueDate";
   if (req.query) {
     delete req.query.skip;
@@ -43,8 +43,8 @@ var filter = function (req, cb) {
   var c = undefined,
     ct,
     st;
-  if (req.body.contentType) ct = req.body.contentType.split(",");
-  if (req.body.status) st = req.body.status.split(",");
+  if (req.query.contentType) ct = req.query.contentType.split(",");
+  if (req.query.status) st = req.query.status.split(",");
   var flt = {
     "sys.spaceId": req.spaceId,
     contentType: {
@@ -54,19 +54,19 @@ var filter = function (req, cb) {
       $in: st
     }
   };
-  if (req.body.name)
+  if (req.query.name)
     flt["fields.name"] = {
       $regex: ".*" + req.body.name + ".*"
     };
-  if (req.body.fields) flt["fields"] = req.body.fields;
-  if (!req.body.contentType) delete flt.contentType;
-  if (!req.body.status) delete flt.status;
+  if (req.query.fields) flt["fields"] = req.query.fields;
+  if (!req.query.contentType) delete flt.contentType;
+  if (!req.query.status) delete flt.status;
   console.log(flt);
   Contents.find(flt)
     .populate("contentType", "title media")
     .select("fields.name fields.description status sys contentType")
-    .skip(skip)
-    .limit(limit)
+    .skip(skip || 0)
+    .limit(limit || 1000)
     .sort(sort)
     .exec(function (err, contents) {
       var result = {
@@ -993,7 +993,7 @@ var countAll = function (req, cb) {
       result.error = undefined;
       result.data = {
         count: contentTypes,
-        limits: 100
+        limits: 10000
       };
       cb(result);
     });
