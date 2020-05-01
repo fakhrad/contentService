@@ -1,5 +1,6 @@
 const Contents = require("../models/content");
 const ContentTypes = require("../models/contentType");
+const Hits = require("../models/hits");
 var uniqid = require("uniqid");
 var mongoose = require('mongoose')
 var contentCreated = require("../events/contents/OnContentCreated");
@@ -11,23 +12,127 @@ var contentUnPublished = require("../events/contents/OnContentUnPublished");
 var contentUpdated = require("../events/contents/OnContentUpdated");
 var contentSubmitted = require("../events/contents/OnContentSubmitted");
 
-var newfilter = function (req, res, next) {
-  if (!req.body.contentType) throw new Error("Invalid contentType");
+var newfilter = function (req, cb) {
+  if (!req.query.contentType) throw new Error("Invalid contentType");
   console.log(req.query);
+  delete req.query.loadrelations;
+  var skip = parseInt(req.query.skip) || 0;
+  delete req.query.skip;
+  var limit = parseInt(req.query.limit) || 100;
+  delete req.query.limit;
+  var sort = req.query.sort || "-sys.issueDate";
+  delete req.query.sort;
   Contents.find(req.query)
     .select("fields sys.issuer, sys.issueDate _id, status")
+    .populate("contentType", "_id title")
+    .skip(skip)
+    .limit(limit)
+    .sort(sort)
     .exec((err, cts) => {
       if (err) {
-        res.status(500).send({
+        cb({
           success: false,
           error: err
         });
         return;
       }
-      res.send({
-        success: true,
-        error: undefined,
-        data: cts
+      ContentTypes.findById(req.query.contentType).exec((err, ctype) => {
+        if (err) {
+          cb({
+            success: false,
+            error: err
+          });
+          return;
+        }
+        var relfields = [];
+        for (var field in ctype.fields) {
+          if (ctype.fields[field].type === "reference") {
+            var references = ctype.fields[field].references;
+            if (references) {
+              references.forEach(ref => {
+                relfields.push({
+                  name: ctype.fields[field].name,
+                  ctype: ref,
+                  select: ctype.fields[field].fields
+                });
+              });
+            }
+          }
+        }
+        var reldata = [];
+        if (relfields.length > 0) {
+          var ids = [];
+          relfields.forEach(fld => {
+            cts.forEach(content => {
+              if (
+                content.fields[fld.name] &&
+                content.fields[fld.name].length > 0
+              ) {
+                if (isArray(content.fields[fld.name])) {
+                  content.fields[fld.name].forEach(item => {
+                    if (
+                      item.length > 0 &&
+                      mongoose.Types.ObjectId.isValid(item)
+                    )
+                      ids.push(item);
+                  });
+                } else {
+                  if (mongoose.Types.ObjectId.isValid(content.fields[fld.name]))
+                    ids.push(content.fields[fld.name]);
+                }
+              }
+            });
+          });
+          Contents.find({
+              _id: {
+                $in: ids
+              }
+            })
+            .select("fields _id contentType status")
+            .exec((err, rels) => {
+              if (err) {
+                console.log(err);
+                cb({
+                  success: true,
+                  data: cts
+                });
+                return;
+              }
+              relfields.forEach(fld => {
+                cts.forEach(content => {
+                  if (
+                    content.fields[fld.name] &&
+                    content.fields[fld.name].length > 0
+                  ) {
+                    if (isArray(content.fields[fld.name])) {
+                      for (i = 0; i < content.fields[fld.name].length; i++) {
+                        var item = content.fields[fld.name][i];
+                        var row = rels.filter(
+                          a => a._id.toString() === item.toString()
+                        );
+                        if (row.length > 0) {
+                          content.fields[fld.name][i] = row[0];
+                        }
+                      }
+                    } else {
+                      var row = rels.filter(
+                        a =>
+                        a._id.toString() ===
+                        content.fields[fld.name].toString()
+                      );
+                      if (row.length > 0) {
+                        content.fields[fld.name] = row[0];
+                      }
+                    }
+                  }
+                });
+              });
+              cb({
+                success: true,
+                data: cts
+              });
+            });
+        }
       });
     });
 };
@@ -56,7 +161,7 @@ var filter = function (req, cb) {
   };
   if (req.query.name)
     flt["fields.name"] = {
-      $regex: ".*" + req.body.name + ".*"
+      $regex: ".*" + req.query.name + ".*"
     };
   if (req.query.fields) flt["fields"] = req.query.fields;
   if (!req.query.contentType) delete flt.contentType;
@@ -140,17 +245,189 @@ var loadContents = function (req, cb) {
 };
 
 var findAll = function (req, cb) {
-  var skip = req.query ? req.query.skip || 0 : 0;
-  var limit = req.query ? req.query.limit || 10000 : 10000;
+  console.log("Find All")
+  var drange = undefined;
+  if (req.body && req.body.daterange)
+    drange = req.body.daterange;
+  if (req.query && req.query.daterange)
+    drange = req.query.daterange;
+  var start, end;
+
+  var format = "%Y-%m-%dT%H:%M:%S";
+  var date = undefined
+  if (drange != undefined) {
+    date = {};
+    switch (drange) {
+      case "today":
+        start = new Date();
+        start.setDate(start.getDate());
+        start.setHours(0, 0, 0, 0);
+        end = new Date();
+        end.setDate(end.getDate());
+        end.setHours(23, 59, 59, 999);
+        format = "%H:00"
+        break;
+      case "yesterday":
+        start = new Date();
+        start.setDate(start.getDate() - 1);
+        start.setHours(0, 0, 0, 0);
+        end = new Date();
+        end.setDate(end.getDate() - 1);
+        end.setHours(23, 59, 59, 999);
+        format = "%H:00"
+        break;
+      case "last7days":
+        start = new Date();
+        start.setDate(start.getDate() - 7);
+        start.setHours(0, 0, 0, 0);
+        end = new Date();
+        end.setDate(end.getDate());
+        end.setHours(23, 59, 59, 999);
+        format = "%m-%d"
+        break;
+      case "last30days":
+        start = new Date();
+        start.setDate(start.getDate() - 30);
+        start.setHours(0, 0, 0, 0);
+        end = new Date();
+        end.setDate(end.getDate());
+        end.setHours(23, 59, 59, 999);
+        format = "%m-%d"
+        break;
+      case "last6months":
+        start = new Date();
+        start.setMonth(start.getMonth() - 6);
+        start.setHours(0, 0, 0, 0);
+        end = new Date();
+        end.setDate(end.getDate());
+        end.setHours(23, 59, 59, 999);
+        format = "%Y-%m"
+        break;
+      case "thisyear":
+        start = new Date();
+        start.setMonth(0)
+        start.setDate(0);
+        start.setHours(0, 0, 0, 1);
+        end = new Date();
+        end.setHours(23, 59, 59, 999);
+        format = "%Y-%m"
+        break;
+      default:
+      case "lifetime":
+        date = undefined;
+        format = "%Y-%m"
+        break;
+      case "custom":
+        start = new Date(req.query.startDate);
+        end = new Date(req.query.endDate);
+        format = "%Y-%m-%d"
+        break;
+    }
+  }
+
+  var params = {
+    "sys.spaceId": req.spaceId
+  }
+
+  if (req.body && req.body.contentType)
+    params.contentType = new mongoose.Types.ObjectId(req.body.contentType)
+  if (req.query && req.query.contentType)
+    params.contentType = new mongoose.Types.ObjectId(req.query.contentType)
+
+
+  if (date != undefined) {
+    params["sys.issueDate"] = {
+      "$gt": start,
+      "$lt": end
+    }
+  }
+  var skip = req.query ? parseInt(req.query.skip) || 0 : 0;
+  var limit = req.query ? parseInt(req.query.limit) || 10000 : 10000;
   var sort = req.query ? req.query.sort || "-sys.issueDate" : "-sys.issueDate";
+  console.log(JSON.stringify(req));
   if (req.query) {
     delete req.query.skip;
     delete req.query.limit;
     delete req.query.sort;
+    if (req.query.name) {
+      params["fields.name"] = {
+        $regex: ".*" + req.query.name + ".*"
+      };
+    }
+    if (req.query.status) {
+      if (isArray(req.query.status)) {
+        params.status = {
+          $in: req.query.status
+        }
+      } else {
+        params.status = req.query.status;
+      }
+    }
+
+    if (req.query.contentType) {
+      if (isArray(req.query.contentType)) {
+        params.contentType = {
+          $in: req.query.contentType
+        }
+      } else {
+        params.contentType = req.query.contentType;
+      }
+    }
+
+    if (req.query.search) {
+      for (i = 0; i < Object.keys(req.body.search).length; i++) {
+        var field = req.body.search[i];
+        if (isArray(req.body.search[field])) {
+          params[field] = {
+            $in: req.body.search[field]
+          }
+        } else {
+          params[field] = req.body.search[field];
+        }
+      }
+    }
   }
-  Contents.find({
-      "sys.spaceId": req.spaceId
-    })
+
+  if (req.body) {
+    if (req.body.name) {
+      params["feilds.name"] = {
+        $regex: ".*" + req.body.name + ".*"
+      };
+    }
+    if (req.body.status) {
+      if (isArray(req.body.status)) {
+        params.status = {
+          $in: req.body.status
+        }
+      } else {
+        params.status = req.body.status;
+      }
+    }
+    if (req.body.contentType) {
+      if (isArray(req.body.contentType)) {
+        params.contentType = {
+          $in: req.body.contentType
+        }
+      } else {
+        params.contentType = req.body.contentType;
+      }
+    }
+    if (req.body.search) {
+      for (i = 0; i < Object.keys(req.body.search).length; i++) {
+        console.log(Object.keys(req.body.search)[i])
+        var field = Object.keys(req.body.search)[i];
+        if (isArray(req.body.search[field])) {
+          params[field] = {
+            $in: req.body.search[field]
+          }
+        } else {
+          params[field] = req.body.search[field];
+        }
+      }
+    }
+  }
+  console.log(JSON.stringify(params));
+  Contents.find(params)
     .populate("contentType", "title media")
     .select("fields.name fields.description status sys contentType")
     .skip(skip)
@@ -182,6 +459,17 @@ var findAll = function (req, cb) {
       }
     });
 };
+
+var hit = async function (content, caller, userId) {
+  var hititem = new Hits({
+    objectId: content._id,
+    type: "contents",
+    caller: caller,
+    issueDate: new Date(),
+    userId: userId
+  });
+  hititem.save(function (err) {});
+}
 var findById = function (req, cb) {
   Contents.findById(req.body.id)
     .populate("contentType")
@@ -202,6 +490,7 @@ var findById = function (req, cb) {
         result.success = true;
         result.error = undefined;
         result.data = content;
+        hit(content, "findbyid", req.userId);
         cb(result);
       } else {
         result.success = false;
@@ -236,6 +525,7 @@ var findByLink = function (req, cb) {
         result.error = undefined;
 
         result.data = content;
+        hit(content, "findbylink", req.userId);
         cb(result);
       } else {
         result.success = false;
@@ -833,7 +1123,10 @@ exports.query = function (req, cb) {
           }
         }).exec((err, ttypes) => {
           if (err) {
-            cb(cts);
+            cb({
+              success: true,
+              data: cts
+            });
             return;
           } else {
             ttypes.forEach(ctype => {
@@ -887,7 +1180,10 @@ exports.query = function (req, cb) {
               .select("fields _id")
               .exec((err, rels) => {
                 if (err) {
-                  cb(cts);
+                  cb({
+                    success: true,
+                    data: cts
+                  });
                   return;
                 }
                 for (var l = 0; l < ttypes.length; l++) {
@@ -957,13 +1253,19 @@ exports.query = function (req, cb) {
                     }
                   });
                 }
-                cb(cts);
+                cb({
+                  success: true,
+                  data: cts
+                });
               });
           }
         });
       } catch (e) {
         console.log(e);
-        cb(cts);
+        cb({
+          success: true,
+          data: cts
+        });
       }
     });
 };
@@ -974,6 +1276,8 @@ var countAll = function (req, cb) {
   }
   if (req.body && req.body.contentType)
     query.contentType = req.body.contentType
+  if (req.query && req.query.contentType)
+    query.contentType = new mongoose.Types.ObjectId(req.query.contentType)
   console.log(query)
   Contents.where(query)
     .countDocuments(function (err, contentTypes) {
@@ -1000,15 +1304,184 @@ var countAll = function (req, cb) {
 };
 
 var contentsByStatus = function (req, cb) {
+  console.log("Status")
+  var drange = "last30days";
+  if (req.body && req.body.daterange)
+    drange = req.body.daterange;
+  if (req.query && req.query.daterange)
+    drange = req.query.daterange;
+  if (drange == undefined)
+    drange = "today";
+  var start, end;
+
+  var format = "%Y-%m-%dT%H:%M:%S";
+  var date = {}
+  switch (drange) {
+    case "today":
+      start = new Date();
+      start.setDate(start.getDate());
+      start.setHours(0, 0, 0, 0);
+      end = new Date();
+      end.setDate(end.getDate());
+      end.setHours(23, 59, 59, 999);
+      format = "%H:00"
+      break;
+    case "yesterday":
+      start = new Date();
+      start.setDate(start.getDate() - 1);
+      start.setHours(0, 0, 0, 0);
+      end = new Date();
+      end.setDate(end.getDate() - 1);
+      end.setHours(23, 59, 59, 999);
+      format = "%H:00"
+      break;
+    case "last7days":
+      start = new Date();
+      start.setDate(start.getDate() - 7);
+      start.setHours(0, 0, 0, 0);
+      end = new Date();
+      end.setDate(end.getDate());
+      end.setHours(23, 59, 59, 999);
+      format = "%m-%d"
+      break;
+    case "last30days":
+      start = new Date();
+      start.setDate(start.getDate() - 30);
+      start.setHours(0, 0, 0, 0);
+      end = new Date();
+      end.setDate(end.getDate());
+      end.setHours(23, 59, 59, 999);
+      format = "%m-%d"
+      break;
+    case "last6months":
+      start = new Date();
+      start.setMonth(start.getMonth() - 6);
+      start.setHours(0, 0, 0, 0);
+      end = new Date();
+      end.setDate(end.getDate());
+      end.setHours(23, 59, 59, 999);
+      format = "%Y-%m"
+      break;
+    case "thisyear":
+      start = new Date();
+      start.setMonth(0)
+      start.setDate(0);
+      start.setHours(0, 0, 0, 1);
+      end = new Date();
+      end.setHours(23, 59, 59, 999);
+      format = "%Y-%m"
+      break;
+    default:
+    case "lifetime":
+      date = undefined;
+      format = "%Y-%m"
+      break;
+    case "custom":
+      start = new Date(req.query.startDate);
+      end = new Date(req.query.endDate);
+      format = "%Y-%m-%d"
+      break;
+  }
+
+  console.log(req.body);
+  console.log(req.query);
+  console.log(drange);
   var query = {
     "sys.spaceId": req.spaceId
   }
+
   if (req.body && req.body.contentType)
     query.contentType = new mongoose.Types.ObjectId(req.body.contentType)
-  console.log(query)
+  if (req.query && req.query.contentType)
+    query.contentType = new mongoose.Types.ObjectId(req.query.contentType)
+
+
+  if (date != undefined) {
+    query["sys.issueDate"] = {
+      "$gt": start,
+      "$lt": end
+    }
+  }
+
+  if (req.query) {
+    delete req.query.skip;
+    delete req.query.limit;
+    delete req.query.sort;
+    if (req.query.name) {
+      if (req.body.lang) {
+        query["fields.name." + req.body.lang] = {
+          $regex: ".*" + req.body.name + ".*"
+        };
+      } else {
+        query["fields.name"] = {
+          $regex: ".*" + req.body.name + ".*"
+        };
+      }
+    }
+    if (req.query.status) {
+      if (isArray(req.query.status)) {
+        query.status = {
+          $in: req.query.status
+        }
+      } else {
+        query.status = req.query.status;
+      }
+    }
+
+    if (req.query.search) {
+      for (i = 0; i < Object.keys(req.body.search).length; i++) {
+        var field = req.body.search[i];
+        if (isArray(req.body.search[field])) {
+          query[field] = {
+            $in: req.body.search[field]
+          }
+        } else {
+          query[field] = req.body.search[field];
+        }
+      }
+    }
+  }
+
+  if (req.body) {
+    if (req.body.name) {
+      if (req.body.lang) {
+        query["fields.name." + req.body.lang] = {
+          $regex: ".*" + req.body.name + ".*"
+        };
+      } else {
+        query["fields.name"] = {
+          $regex: ".*" + req.body.name + ".*"
+        };
+      }
+    }
+    if (req.body.status) {
+      if (isArray(req.body.status)) {
+        query.status = {
+          $in: req.body.status
+        }
+      } else {
+        query.status = req.body.status;
+      }
+    }
+
+    if (req.body.search) {
+      for (i = 0; i < Object.keys(req.body.search).length; i++) {
+        console.log(Object.keys(req.body.search)[i])
+        var field = Object.keys(req.body.search)[i];
+        if (isArray(req.body.search[field])) {
+          query[field] = {
+            $in: req.body.search[field]
+          }
+        } else {
+          query[field] = req.body.search[field];
+        }
+      }
+    }
+  }
   const aggregatorOpts = [{
       $match: query
-    }, {
+    },
+    {
       $unwind: "$status"
     },
     {
@@ -1017,6 +1490,11 @@ var contentsByStatus = function (req, cb) {
         count: {
           $sum: 1
         }
+      }
+    },
+    {
+      $sort: {
+        _id: 1
       }
     }
   ]
@@ -1042,21 +1520,180 @@ var contentsByStatus = function (req, cb) {
 };
 
 var dailyInputs = function (req, cb) {
-  var days = 30;
-  if (req.body && req.body.days) {
-    days = parseInt(req.body.days)
+  var drange = "last30days";
+  if (req.body && req.body.daterange)
+    drange = req.body.daterange;
+  if (req.query && req.query.daterange)
+    drange = req.query.daterange;
+  if (drange == undefined)
+    drange = "today";
+  var start, end;
+
+  var format = "%Y-%m-%dT%H:%M:%S";
+  var date = {}
+  switch (drange) {
+    case "today":
+      start = new Date();
+      start.setDate(start.getDate());
+      start.setHours(0, 0, 0, 0);
+      end = new Date();
+      end.setDate(end.getDate());
+      end.setHours(23, 59, 59, 999);
+      format = "%H:00"
+      break;
+    case "yesterday":
+      start = new Date();
+      start.setDate(start.getDate() - 1);
+      start.setHours(0, 0, 0, 0);
+      end = new Date();
+      end.setDate(end.getDate() - 1);
+      end.setHours(23, 59, 59, 999);
+      format = "%H:00"
+      break;
+    case "last7days":
+      start = new Date();
+      start.setDate(start.getDate() - 7);
+      start.setHours(0, 0, 0, 0);
+      end = new Date();
+      end.setDate(end.getDate());
+      end.setHours(23, 59, 59, 999);
+      format = "%m-%d"
+      break;
+    case "last30days":
+      start = new Date();
+      start.setDate(start.getDate() - 30);
+      start.setHours(0, 0, 0, 0);
+      end = new Date();
+      end.setDate(end.getDate());
+      end.setHours(23, 59, 59, 999);
+      format = "%m-%d"
+      break;
+    case "last6months":
+      start = new Date();
+      start.setMonth(start.getMonth() - 6);
+      start.setHours(0, 0, 0, 0);
+      end = new Date();
+      end.setDate(end.getDate());
+      end.setHours(23, 59, 59, 999);
+      format = "%Y-%m"
+      break;
+    case "thisyear":
+      start = new Date();
+      start.setMonth(0)
+      start.setDate(0);
+      start.setHours(0, 0, 0, 1);
+      end = new Date();
+      end.setHours(23, 59, 59, 999);
+      format = "%Y-%m"
+      break;
+    default:
+    case "lifetime":
+      date = undefined;
+      format = "%Y-%m"
+      break;
+    case "custom":
+      start = new Date(req.query.startDate);
+      end = new Date(req.query.endDate);
+      format = "%Y-%m-%d"
+      break;
   }
-  var d = new Date();
-  d.setDate(d.getDate() - days);
+
+  console.log(req.body);
+  console.log(req.query);
+  console.log(drange);
   var query = {
-    "sys.spaceId": req.spaceId,
-    "sys.issueDate": {
-      "$gte": d,
-      "$lt": new Date()
-    }
+    "sys.spaceId": req.spaceId
   }
+
   if (req.body && req.body.contentType)
     query.contentType = new mongoose.Types.ObjectId(req.body.contentType)
+  if (req.query && req.query.contentType)
+    query.contentType = new mongoose.Types.ObjectId(req.query.contentType)
+
+
+  if (date != undefined) {
+    query["sys.issueDate"] = {
+      "$gt": start,
+      "$lt": end
+    }
+  }
+
+  if (req.query) {
+    delete req.query.skip;
+    delete req.query.limit;
+    delete req.query.sort;
+    if (req.query.name) {
+      if (req.body.lang) {
+        query["fields.name." + req.body.lang] = {
+          $regex: ".*" + req.body.name + ".*"
+        };
+      } else {
+        query["fields.name"] = {
+          $regex: ".*" + req.body.name + ".*"
+        };
+      }
+    }
+    if (req.query.status) {
+      if (isArray(req.query.status)) {
+        query.status = {
+          $in: req.query.status
+        }
+      } else {
+        query.status = req.query.status;
+      }
+    }
+
+    if (req.query.search) {
+      for (i = 0; i < Object.keys(req.body.search).length; i++) {
+        var field = req.body.search[i];
+        if (isArray(req.body.search[field])) {
+          query[field] = {
+            $in: req.body.search[field]
+          }
+        } else {
+          query[field] = req.body.search[field];
+        }
+      }
+    }
+  }
+
+  if (req.body) {
+    if (req.body.name) {
+      if (req.body.lang) {
+        query["fields.name." + req.body.lang] = {
+          $regex: ".*" + req.body.name + ".*"
+        };
+      } else {
+        query["fields.name"] = {
+          $regex: ".*" + req.body.name + ".*"
+        };
+      }
+    }
+    if (req.body.status) {
+      if (isArray(req.body.status)) {
+        query.status = {
+          $in: req.body.status
+        }
+      } else {
+        query.status = req.body.status;
+      }
+    }
+
+    if (req.body.search) {
+      for (i = 0; i < Object.keys(req.body.search).length; i++) {
+        console.log(Object.keys(req.body.search)[i])
+        var field = Object.keys(req.body.search)[i];
+        if (isArray(req.body.search[field])) {
+          query[field] = {
+            $in: req.body.search[field]
+          }
+        } else {
+          query[field] = req.body.search[field];
+        }
+      }
+    }
+  }
+
   const aggregatorOpts = [{
       $match: query
     },
@@ -1065,7 +1702,7 @@ var dailyInputs = function (req, cb) {
         "_id": 0,
         "issueDate": {
           "$dateToString": {
-            "format": "%Y-%m-%d",
+            "format": format,
             "date": "$sys.issueDate"
           }
         }
@@ -1082,7 +1719,11 @@ var dailyInputs = function (req, cb) {
         }
       }
     },
-
+    {
+      $sort: {
+        "_id": 1
+      }
+    }
   ]
   console.log(JSON.stringify(aggregatorOpts))
   Contents.aggregate(aggregatorOpts, function (err, contents) {
@@ -1106,21 +1747,110 @@ var dailyInputs = function (req, cb) {
 };
 
 var getRecentItems = function (req, cb) {
-  var query = {
-    "sys.spaceId": req.spaceId
-  }
-  var skip = req.body ? req.body.skip || 0 : 0;
-  var limit = req.body ? req.body.limit || 10 : 10;
-  var sort = req.body ? req.body.sort || "-sys.issueDate" : "-sys.issueDate";
-  if (req.body) {
-    delete req.body.skip;
-    delete req.body.limit;
-    delete req.body.sort;
-  }
-  if (req.body && req.body.contentType)
-    query.contentType = req.body.contentType
 
-  Contents.find(query)
+  console.log(JSON.stringify(req))
+  var skip = req.query ? parseInt(req.query.skip) || 0 : 0;
+  var limit = req.query ? parseInt(req.query.limit) || 10000 : 10000;
+  var sort = req.query ? req.query.sort || "-sys.issueDate" : "-sys.issueDate";
+
+  var params = {
+    "sys.spaceId": req.spaceId || req.spaceid
+  }
+  if (req.query) {
+    delete req.query.skip;
+    delete req.query.limit;
+    delete req.query.sort;
+    if (req.query.name) {
+      if (req.body.lang) {
+        params["fields.name." + req.body.lang] = {
+          $regex: ".*" + req.body.name + ".*"
+        };
+      } else {
+        params["fields.name"] = {
+          $regex: ".*" + req.body.name + ".*"
+        };
+      }
+    }
+    if (req.query.status) {
+      if (isArray(req.query.status)) {
+        params.status = {
+          $in: req.query.status
+        }
+      } else {
+        params.status = req.query.status;
+      }
+    }
+
+    if (req.query.contentType) {
+      if (isArray(req.query.contentType)) {
+        params.contentType = {
+          $in: req.query.contentType
+        }
+      } else {
+        params.contentType = req.query.contentType;
+      }
+    }
+
+    if (req.query.search) {
+      for (i = 0; i < Object.keys(req.body.search).length; i++) {
+        var field = req.body.search[i];
+        if (isArray(req.body.search[field])) {
+          params[field] = {
+            $in: req.body.search[field]
+          }
+        } else {
+          params[field] = req.body.search[field];
+        }
+      }
+    }
+  }
+
+  if (req.body) {
+    if (req.body.name) {
+      if (req.body.lang) {
+        params["fields.name." + req.body.lang] = {
+          $regex: ".*" + req.body.name + ".*"
+        };
+      } else {
+        params["fields.name"] = {
+          $regex: ".*" + req.body.name + ".*"
+        };
+      }
+    }
+    if (req.body.status) {
+      if (isArray(req.body.status)) {
+        params.status = {
+          $in: req.body.status
+        }
+      } else {
+        params.status = req.body.status;
+      }
+    }
+    if (req.body.contentType) {
+      if (isArray(req.body.contentType)) {
+        params.contentType = {
+          $in: req.body.contentType
+        }
+      } else {
+        params.contentType = req.body.contentType;
+      }
+    }
+    if (req.body.search) {
+      for (i = 0; i < Object.keys(req.body.search).length; i++) {
+        console.log(Object.keys(req.body.search)[i])
+        var field = Object.keys(req.body.search)[i];
+        if (isArray(req.body.search[field])) {
+          params[field] = {
+            $in: req.body.search[field]
+          }
+        } else {
+          params[field] = req.body.search[field];
+        }
+      }
+    }
+  }
+  console.log(JSON.stringify(params));
+  Contents.find(params)
     .populate("contentType", "title media")
     .select("fields.name fields.description status sys contentType")
     .skip(parseInt(skip))
@@ -1154,6 +1884,7 @@ var getRecentItems = function (req, cb) {
 };
 exports.getAll = findAll;
 exports.filter = filter;
+exports.getwithrelations = newfilter;
 exports.findById = findById;
 exports.findByLink = findByLink;
 exports.add = addContent;
